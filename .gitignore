@@ -1,0 +1,31 @@
+# Built application files
+*.apk
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Android Studio
+captures/
+
+*.iml
+.idea/
+
+# Gradle cache
+.gradle
+build/
+
+# Local configuration file
+local.properties
+
+# System files
+.DS_Store
+
+# keystore file
+keystore.properties
+
+# Firebase json file
+google-services.json
