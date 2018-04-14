@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDocClicked() {
 
+        Intent intent = new Intent(this,DocEditActivity.class);
+        startActivity(intent);
+
     }
 
     private void initializeWidgets(){

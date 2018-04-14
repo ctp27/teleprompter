@@ -14,6 +14,17 @@
         <item name="android:windowBackground">@color/greyBackground</item>
     </style>
 
+    <style name="AppThemeDarkBg" parent="AppTheme">
+        <item name="android:windowBackground">@color/greyBackground</item>
+    </style>
+
+    <style name="editDocTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/colorWhite</item>
+        <item name="colorPrimaryDark">@color/colorDarkNotification</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

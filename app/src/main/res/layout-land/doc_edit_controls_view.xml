@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    app:cardElevation="12dp"
+    >
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/control_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/colorViewFrame"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="64dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="64dp"
+            android:layout_marginStart="24dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/background_color_picker_frame"
+            app:layout_constraintEnd_toStartOf="@+id/background_color_picker_frame"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/background_color_picker_frame">
+
+            <com.ctp.theteleprompter.ui.ColorView
+                android:id="@+id/text_color_picker_view"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                app:show_text="false"
+                tools:background="@color/colorWhite" />
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/background_color_picker_frame"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="24dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline2">
+
+            <com.ctp.theteleprompter.ui.ColorView
+                android:id="@+id/background_color_picker_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:elevation="6dp"
+                app:show_text="false"
+                tools:background="@color/colorWhite" />
+        </android.support.v7.widget.CardView>
+
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="76dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/round_button_shape"
+            android:elevation="4dp"
+            android:src="@drawable/ic_play_arrow_white_24dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+        <SeekBar
+            android:id="@+id/seekBar_speed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:max="5"
+            app:layout_constraintEnd_toStartOf="@+id/seekBar_speed_display"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar_speed_lab" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.35" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.64" />
+
+        <SeekBar
+            android:id="@+id/seekBar_font_size"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:max="3"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintEnd_toStartOf="@+id/font_size_display"
+            app:layout_constraintStart_toStartOf="@+id/seekBar_speed"
+            app:layout_constraintTop_toBottomOf="@+id/font_size_label" />
+
+        <TextView
+            android:id="@+id/text_color_picker_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Text color"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/colorViewFrame"
+            app:layout_constraintStart_toStartOf="@+id/colorViewFrame"
+            app:layout_constraintTop_toBottomOf="@+id/colorViewFrame" />
+
+        <TextView
+            android:id="@+id/background_color_picker_label"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Background color"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/background_color_picker_frame"
+            app:layout_constraintStart_toStartOf="@+id/background_color_picker_frame"
+            app:layout_constraintTop_toBottomOf="@+id/background_color_picker_frame" />
+
+        <TextView
+            android:id="@+id/seekBar_speed_lab"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Scroll Speed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/seekBar_speed_display"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:text="2"
+            app:layout_constraintBottom_toBottomOf="@+id/seekBar_speed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seekBar_speed" />
+
+        <TextView
+            android:id="@+id/font_size_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/font_size_label"
+            app:layout_constraintStart_toStartOf="@+id/seekBar_speed_lab"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar_speed" />
+
+        <TextView
+            android:id="@+id/font_size_display"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:text="S"
+            app:layout_constraintBottom_toBottomOf="@+id/seekBar_font_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seekBar_font_size" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>

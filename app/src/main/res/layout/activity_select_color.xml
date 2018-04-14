@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        tools:context="com.google.developer.colorvalue.AddCardActivity">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/colorFrame"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_margin="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <com.ctp.theteleprompter.ui.ColorView
+                android:id="@+id/color"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:background="@android:color/black"
+                android:textSize="0sp"
+
+                />
+
+        </android.support.v7.widget.CardView>
+
+
+        <TextView
+            android:id="@+id/text_red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="R"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_red" />
+
+        <SeekBar
+            android:id="@+id/seek_red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/seek_red_margin_start"
+            android:layout_marginLeft="@dimen/seek_red_margin_start"
+            android:layout_marginTop="@dimen/seek_red_margin_top"
+            android:max="255"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/text_red"
+            app:layout_constraintTop_toBottomOf="@+id/colorFrame" />
+
+        <TextView
+            android:id="@+id/text_green"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="G"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_green" />
+
+        <SeekBar
+            android:id="@+id/seek_green"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:max="255"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/text_green"
+            app:layout_constraintTop_toBottomOf="@+id/seek_red" />
+
+        <TextView
+            android:id="@+id/text_blue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="B"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seek_blue" />
+
+        <SeekBar
+            android:id="@+id/seek_blue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:max="255"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/text_blue"
+            app:layout_constraintTop_toBottomOf="@+id/seek_green" />
+
+
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

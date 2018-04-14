@@ -29,3 +29,6 @@ keystore.properties
 
 # Firebase json file
 google-services.json
+
+# Gradle properties
+gradle.properties
