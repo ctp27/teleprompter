@@ -1,6 +1,7 @@
 package com.ctp.theteleprompter.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,11 +10,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ctp.theteleprompter.R;
+import com.ctp.theteleprompter.model.Doc;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,35 +22,20 @@ import butterknife.ButterKnife;
 public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridViewHolder>{
 
     private DocGridAdapterCallbacks mCallback;
+    private Cursor cursor;
 
-    public DocGridAdapter(DocGridAdapterCallbacks mCallback) {
+    private List<Doc> docList;
+
+    public DocGridAdapter(DocGridAdapterCallbacks mCallback, Cursor cursor) {
         this.mCallback = mCallback;
+        this.cursor = cursor;
+        docList = new ArrayList<>();
     }
 
     public interface DocGridAdapterCallbacks{
-        void onDocClicked();
+        void onDocClicked(Doc clickedDoc);
     }
 
-
-    List<DummyClass> dummyData = new ArrayList<>();
-
-    {
-        for(int i=0;i<11;i++){
-            dummyData.add(new DummyClass("Doc Title "+i,getTextPreview()));
-        }
-
-    }
-
-    private String getTextPreview(){
-        int random = new Random().nextInt(5);
-        String theJob ="text Preview ";
-        String returnString= "";
-        for(int i=0;i<random;i++){
-            theJob +=theJob;
-        }
-
-        return theJob;
-    }
 
     @NonNull
     @Override
@@ -62,31 +48,73 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
     @Override
     public void onBindViewHolder(@NonNull DocGridViewHolder holder, int position) {
 
-        DummyClass dummyClass = dummyData.get(position);
+        Doc doc = docList.get(position);
 
-        holder.docTitle.setText(dummyClass.getTitle());
-        holder.docPreview.setText(dummyClass.getSubTitle());
-        holder.itemView.setTag(position);
+
+        holder.docTitle.setText(doc.getTitle());
+        holder.docPreview.setText(doc.getText());
+        holder.itemView.setTag(doc.getId());
 
     }
 
     public void deletePosition(int position){
-        dummyData.remove(position);
-        notifyDataSetChanged();
+        notifyItemRemoved(position);
+    }
+
+    public Doc getDocAtPosition(int position){
+        return docList.get(position);
+
     }
 
 
     public void move(int fromPosition, int toPosition){
-        Collections.swap(dummyData, fromPosition, toPosition);
+        Collections.swap(docList, fromPosition, toPosition);
         notifyItemMoved(fromPosition,toPosition);
+
+
+    }
+
+
+    public List<Doc> getDocList() {
+        return docList;
     }
 
     @Override
     public int getItemCount() {
-        if(dummyData==null){
+
+        if(docList==null)
             return 0;
+        return docList.size();
+
+    }
+
+    public void swapCursor(Cursor newCursor){
+
+        if(cursor!=null){
+            cursor = null;
         }
-        return dummyData.size();
+        cursor = newCursor;
+        populateListFromCursor();
+
+    }
+
+
+    private void populateListFromCursor(){
+
+        if(cursor!=null) {
+            docList = new ArrayList<>();
+
+            while (cursor.moveToNext()) {
+                docList.add(new Doc(cursor));
+            }
+
+        }
+        else {
+            docList = null;
+        }
+
+        notifyDataSetChanged();
+
     }
 
 
@@ -109,7 +137,10 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
 
         @Override
         public void onClick(View view) {
-            mCallback.onDocClicked();
+            int position = getAdapterPosition();
+            cursor.moveToPosition(position);
+            Doc doc = new Doc(cursor);
+            mCallback.onDocClicked(doc);
         }
     }
 }

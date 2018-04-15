@@ -39,6 +39,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <provider
+            android:authorities="com.ctp.theteleprompter.data"
+            android:name="com.ctp.theteleprompter.data.TeleContentProvider"
+            android:exported="false"/>
+
+        <service android:name=".services.DocService"
+            />
+
     </application>
 
 </manifest>

@@ -8,13 +8,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.ctp.theteleprompter.DocEditActivity;
 import com.ctp.theteleprompter.R;
+import com.ctp.theteleprompter.data.SharedPreferenceUtils;
+import com.ctp.theteleprompter.model.Doc;
+import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.ui.ColorView;
-import com.ctp.theteleprompter.utils.SharedPreferenceUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,12 +58,20 @@ public class DocEditActivityFragment extends Fragment
     @BindView(R.id.play_button)
     ImageButton playButton;
 
+    @BindView(R.id.doc_detail_title)
+    EditText titleText;
+
+    @BindView(R.id.doc_detail_text)
+    EditText textBody;
+
 
 
     private int textColor;
     private int backgroundColor;
     private int speedNumber=1;
     private int fontSize=1;
+
+    private Doc thisDoc=null;
 
 
 
@@ -69,6 +81,11 @@ public class DocEditActivityFragment extends Fragment
 
         textColor = SharedPreferenceUtils.getDefaultTextColor(getContext());
         backgroundColor = SharedPreferenceUtils.getDefaultBackgroundColor(getContext());
+
+        Bundle b = getArguments();
+        if(b.containsKey(DocEditActivity.EXTRA_PARCEL_KEY)){
+            thisDoc = b.getParcelable(DocEditActivity.EXTRA_PARCEL_KEY);
+        }
 
         if(savedInstanceState!=null){
             textColor = savedInstanceState.getInt(BUNDLE_TEXT_COLOR);
@@ -111,6 +128,12 @@ public class DocEditActivityFragment extends Fragment
 
         scrollSpeedBar.setOnSeekBarChangeListener(this);
         fontSizeBar.setOnSeekBarChangeListener(this);
+
+
+        if(thisDoc!=null){
+            titleText.setText(thisDoc.getTitle());
+            textBody.setText(thisDoc.getText());
+        }
 
         return v;
     }
@@ -212,4 +235,49 @@ public class DocEditActivityFragment extends Fragment
                     return "S";
         }
     }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        persistData();
+
+    }
+
+
+
+    private void persistData(){
+
+        boolean isNew = false;
+
+        String title = titleText.getText().toString();
+        String body = textBody.getText().toString();
+
+        if(title.trim().isEmpty() && body.trim().isEmpty()){
+            return;
+        }
+
+        if(thisDoc == null){
+            thisDoc = new Doc();
+            isNew = true;
+        }
+
+
+        thisDoc.setTitle(title);
+        thisDoc.setText(body);
+
+        thisDoc.setUsername(SharedPreferenceUtils.getPrefUsername(getContext()));
+
+        if(isNew){
+            DocService.insertDoc(getContext(),thisDoc);
+        }
+        else {
+            DocService.updateDoc(getContext(),thisDoc);
+        }
+
+    }
+
+
+
 }

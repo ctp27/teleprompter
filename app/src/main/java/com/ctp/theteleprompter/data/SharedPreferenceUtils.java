@@ -1,4 +1,4 @@
-package com.ctp.theteleprompter.utils;
+package com.ctp.theteleprompter.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,9 +9,13 @@ public class SharedPreferenceUtils {
 
    private static final int DEFAULT_VALUE_BACKGROUND = Color.BLACK;
     private static final int DEFAULT_VALUE_TEXT = Color.WHITE;
+    private static final String DEFAULT_USERNAME = "Local";
 
     private static final String PREF_BACKGROUND_COLOR_KEY ="background-color-key";
     private static final String PREF_TEXT_COLOR_KEY = "text-color-key";
+    private static final String PREF_USERNAME = "tele-username";
+
+
 
     public static int getDefaultBackgroundColor(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -35,6 +39,20 @@ public class SharedPreferenceUtils {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(PREF_TEXT_COLOR_KEY, color);
         editor.apply();
+    }
+
+
+    public static void setPrefUsername(Context context, String username){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(PREF_USERNAME, username);
+        editor.apply();
+    }
+
+
+    public static String getPrefUsername(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(PREF_USERNAME,DEFAULT_USERNAME);
     }
 
 

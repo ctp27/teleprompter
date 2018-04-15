@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="4dp"/>
+        />
 
     <SeekBar
         android:id="@+id/seekBar_speed"
@@ -130,7 +130,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Background color"
+        android:text="@string/background_color_label"
         android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/background_color_picker_frame"
@@ -144,7 +144,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Scroll Speed"
+        android:text="@string/scroll_speed_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
