@@ -145,6 +145,8 @@ public class DocEditActivityFragment extends Fragment
             textBody.setText(thisDoc.getText());
         }
 
+        updateSeekbarValues();
+
         return v;
     }
 
@@ -159,11 +161,11 @@ public class DocEditActivityFragment extends Fragment
         teleSpec.setContent(textBody.getText().toString());
         teleSpec.setFontSize(fontSize);
         teleSpec.setScrollSpeed(speedNumber);
-        if(thisDoc==null) {
-            persistDoc();
-            returnFromSlideshow = true;
-            thisDoc.setNew(false);
-        }
+//        if(thisDoc==null) {
+//            persistDoc();
+//            returnFromSlideshow = true;
+//            thisDoc.setNew(false);
+//        }
         Intent intent = new Intent(getContext(), SlideShowActivity.class);
         intent.putExtra(SlideShowActivity.INTENT_PARCELABLE_EXTRA_KEY,teleSpec);
         startActivity(intent);
@@ -288,7 +290,7 @@ public class DocEditActivityFragment extends Fragment
      */
     private void persistDoc(){
 
-        /*  Get the text from the text view */
+        /*  Get the text from the Edit view */
         String title = titleText.getText().toString();
         String body = textBody.getText().toString();
 

@@ -192,19 +192,22 @@ public class SlideShowActivity extends AppCompatActivity {
 
 
         ActionBar actionBar = getSupportActionBar();
-
         if(teleSpec!=null){
             content = teleSpec.getContent();
             contentView.setText(content);
             contentView.setTextColor(teleSpec.getFontColor());
-            contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP,32);
+            setSlideShowFontSize(teleSpec.getFontSize());
             slideShowBackgroundView.setBackgroundColor(teleSpec.getBackgroundColor());
+            setAnimationSpeed(teleSpec.getScrollSpeed());
             if(actionBar!=null) {
                 actionBar.setBackgroundDrawable(new ColorDrawable(teleSpec.getBackgroundColor()));
                 actionBar.setTitle(teleSpec.getTitle());
+
             }
 
         }
+
+
 
     }
 
@@ -223,6 +226,12 @@ public class SlideShowActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startScrollAnimation();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        animationHandler.removeCallbacks(animationRunnable);
     }
 
     private void toggle() {
@@ -276,7 +285,7 @@ public class SlideShowActivity extends AppCompatActivity {
         int y = scrollView.getScrollY();
         animationHandler = new Handler();
         animationRunnable = new AnimationRunnable(y);
-        animationHandler.postDelayed(animationRunnable,ANIMATION_DELAY_MILLIS);
+        animationHandler.postDelayed(animationRunnable,animationDelayMillis);
         showPauseButton();
 
         scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
@@ -312,8 +321,8 @@ public class SlideShowActivity extends AppCompatActivity {
         public void run() {
             scrollView.smoothScrollTo(0,scrollTo);
             animationHandler = new Handler();
-            animationRunnable = new AnimationRunnable(scrollTo+ANIMATION_SCROLL_CONSTANT);
-            animationHandler.postDelayed(animationRunnable,ANIMATION_DELAY_MILLIS);
+            animationRunnable = new AnimationRunnable(scrollTo+scrollOffset);
+            animationHandler.postDelayed(animationRunnable,animationDelayMillis);
         }
     }
 
@@ -333,22 +342,62 @@ public class SlideShowActivity extends AppCompatActivity {
     private void setAnimationSpeed(int scrollSpeed){
 
         switch (scrollSpeed){
-            case 1:
+            case 0:
+                animationDelayMillis = 75;
+                scrollOffset = 1;
                 break;
+            case 1:
+                animationDelayMillis = 25;
+                scrollOffset = 1;
+                break;
+
             case 2:
+                animationDelayMillis = 50;
+                scrollOffset = 3;
                 break;
 
             case 3:
+                animationDelayMillis = 25;
+                scrollOffset = 3;
                 break;
 
             case 4:
-                break;
-
-            case 5:
+                animationDelayMillis = 25;
+                scrollOffset = 4;
                 break;
         }
 
     }
+
+
+
+    private void setSlideShowFontSize(int fontSize){
+
+        int size = 16;
+        switch (fontSize){
+
+            case 0:
+                size = 24;
+                break;
+
+            case 1:
+                size = 32;
+                break;
+
+            case 2:
+                size = 40;
+                break;
+
+            case 3:
+                size = 48;
+                break;
+
+        }
+
+        contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP,size);
+
+    }
+
 
 
 
