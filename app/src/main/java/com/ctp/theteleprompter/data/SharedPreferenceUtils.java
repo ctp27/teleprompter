@@ -15,6 +15,8 @@ public class SharedPreferenceUtils {
     private static final String PREF_TEXT_COLOR_KEY = "text-color-key";
     private static final String PREF_USERNAME = "tele-username";
 
+    private static final String PREF_LAST_ID = "last_od";
+
 
 
     public static int getDefaultBackgroundColor(Context context){
@@ -53,6 +55,19 @@ public class SharedPreferenceUtils {
     public static String getPrefUsername(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(PREF_USERNAME,DEFAULT_USERNAME);
+    }
+
+    public static int getLastStoredId(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getInt(PREF_LAST_ID,-1);
+
+    }
+
+    public static void setLastStoredId(Context context, int id){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(PREF_LAST_ID, id);
+        editor.apply();
     }
 
 

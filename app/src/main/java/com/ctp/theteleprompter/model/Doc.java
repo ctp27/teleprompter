@@ -18,9 +18,13 @@ public class Doc implements Parcelable {
     private int priority=-1;
     private String username;
 
+    private boolean isNew;
 
 
-    public Doc(){}
+
+    public Doc(){
+        isNew = false;
+    }
 
     public Doc(Cursor data){
 
@@ -30,7 +34,7 @@ public class Doc implements Parcelable {
         text = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TEXT));
         priority = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_PRIORITY));
         username = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_USER_NAME));
-
+        isNew = false;
     }
 
 
@@ -82,6 +86,13 @@ public class Doc implements Parcelable {
         this.username = username;
     }
 
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
+    }
 
     public Uri getUri() {
         return ContentUris.withAppendedId(TeleContract.TeleEntry.TELE_CONTENT_URI, id);
@@ -114,6 +125,7 @@ public class Doc implements Parcelable {
         text = in.readString();
         priority = in.readInt();
         username = in.readString();
+        isNew = in.readByte()!=0;
 
     }
 
@@ -142,6 +154,6 @@ public class Doc implements Parcelable {
         parcel.writeString(text);
         parcel.writeInt(priority);
         parcel.writeString(username);
-
+        parcel.writeByte((byte) (isNew ? 1 : 0));
     }
 }

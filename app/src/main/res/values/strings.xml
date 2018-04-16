@@ -15,5 +15,7 @@
     <string name="detail_text_hint">Insert Text Here</string>
     <string name="background_color_label">Background color</string>
     <string name="scroll_speed_label">Scroll Speed</string>
+    <string name="slide_show_play_btn_label">Play</string>
+    <string name="slide_show_pause_button">Pause</string>
 
 </resources>

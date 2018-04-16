@@ -105,7 +105,8 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             docList = new ArrayList<>();
 
             while (cursor.moveToNext()) {
-                docList.add(new Doc(cursor));
+                Doc d = new Doc(cursor);
+                docList.add(d);
             }
 
         }

@@ -50,7 +50,7 @@
             app:layout_constraintEnd_toEndOf="@+id/doc_title"
             app:layout_constraintStart_toStartOf="@+id/doc_title"
             android:ellipsize="end"
-            android:maxLines="100"
+            android:maxLines="20"
             tools:text="TextView" />
 
 

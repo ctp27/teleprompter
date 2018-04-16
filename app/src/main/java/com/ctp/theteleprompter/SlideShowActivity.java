@@ -1,12 +1,27 @@
 package com.ctp.theteleprompter;
 
+import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.ctp.theteleprompter.model.TeleSpec;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -83,11 +98,65 @@ public class SlideShowActivity extends AppCompatActivity {
         }
     };
 
+
+    private final View.OnTouchListener mDelayHideTouchListener2 = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                animators.start();
+
+            }
+            return false;
+        }
+    };
+
+
+    public static final String INTENT_PARCELABLE_EXTRA_KEY = "parcel-data-key";
+    private static final int ANIMATION_DELAY_MILLIS = 25;
+    private static final int ANIMATION_SCROLL_CONSTANT =1;
+
+
+    @BindView(R.id.slide_show_scroller)
+    ScrollView scrollView;
+
+    @BindView(R.id.slide_show_pause)
+    Button pauseButton;
+
+    @BindView(R.id.slide_show_play)
+    Button playButton;
+
+    @BindView(R.id.fullscreen_content)
+    TextView contentView;
+
+    @BindView(R.id.slide_show_bg)
+    FrameLayout slideShowBackgroundView;
+
+    private String content;
+    private boolean isPlaying;
+
+    private int animationDelayMillis;
+    private int scrollOffset;
+
+    private AnimatorSet animators;
+    private Handler animationHandler;
+    private AnimationRunnable animationRunnable;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_slide_show);
+        ButterKnife.bind(this);
+//        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(3));
+        TeleSpec teleSpec=null;
+
+        Intent intent = getIntent();
+        if(intent!=null && intent.hasExtra(INTENT_PARCELABLE_EXTRA_KEY)){
+
+            teleSpec = intent.getParcelableExtra(INTENT_PARCELABLE_EXTRA_KEY);
+        }
+
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -105,7 +174,38 @@ public class SlideShowActivity extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        findViewById(R.id.slide_show_play).setOnTouchListener(mDelayHideTouchListener);
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startScrollAnimation();
+            }
+        });
+
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                animationHandler.removeCallbacks(animationRunnable);
+                showPlayButton();
+            }
+        });
+
+
+        ActionBar actionBar = getSupportActionBar();
+
+        if(teleSpec!=null){
+            content = teleSpec.getContent();
+            contentView.setText(content);
+            contentView.setTextColor(teleSpec.getFontColor());
+            contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP,32);
+            slideShowBackgroundView.setBackgroundColor(teleSpec.getBackgroundColor());
+            if(actionBar!=null) {
+                actionBar.setBackgroundDrawable(new ColorDrawable(teleSpec.getBackgroundColor()));
+                actionBar.setTitle(teleSpec.getTitle());
+            }
+
+        }
+
     }
 
     @Override
@@ -116,6 +216,13 @@ public class SlideShowActivity extends AppCompatActivity {
         // created, to briefly hint to the user that UI controls
         // are available.
         delayedHide(100);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startScrollAnimation();
     }
 
     private void toggle() {
@@ -160,6 +267,90 @@ public class SlideShowActivity extends AppCompatActivity {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+
+
+
+
+    private void startScrollAnimation(){
+//        scrollView.fullScroll(ScrollView.FOCUS_UP);
+        int y = scrollView.getScrollY();
+        animationHandler = new Handler();
+        animationRunnable = new AnimationRunnable(y);
+        animationHandler.postDelayed(animationRunnable,ANIMATION_DELAY_MILLIS);
+        showPauseButton();
+
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                if (scrollView != null) {
+                    if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                        //scroll view is at bottom
+                        animationHandler.removeCallbacks(animationRunnable);
+                        showPlayButton();
+                        Log.d("blah","Ended animation");
+
+                    } else {
+                        //scroll view is not at bottom
+
+                    }
+                }
+            }
+        });
+
+
+
+
+    }
+    private class AnimationRunnable implements Runnable {
+        private int scrollTo;
+
+        public AnimationRunnable(int to){
+            scrollTo = to;
+        }
+
+        @Override
+        public void run() {
+            scrollView.smoothScrollTo(0,scrollTo);
+            animationHandler = new Handler();
+            animationRunnable = new AnimationRunnable(scrollTo+ANIMATION_SCROLL_CONSTANT);
+            animationHandler.postDelayed(animationRunnable,ANIMATION_DELAY_MILLIS);
+        }
+    }
+
+
+    private void showPauseButton(){
+        playButton.setVisibility(View.GONE);
+        pauseButton.setVisibility(View.VISIBLE);
+        isPlaying = true;
+    }
+
+    private void showPlayButton(){
+        pauseButton.setVisibility(View.GONE);
+        playButton.setVisibility(View.VISIBLE);
+        isPlaying = false;
+    }
+
+    private void setAnimationSpeed(int scrollSpeed){
+
+        switch (scrollSpeed){
+            case 1:
+                break;
+            case 2:
+                break;
+
+            case 3:
+                break;
+
+            case 4:
+                break;
+
+            case 5:
+                break;
+        }
+
+    }
+
+
 
 //        textView.setScaleX(-1);
 //        textView.setScaleY(1);

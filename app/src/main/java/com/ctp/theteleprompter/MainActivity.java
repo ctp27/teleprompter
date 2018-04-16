@@ -18,8 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.ctp.theteleprompter.adapters.DocGridAdapter;
@@ -80,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         if(id==DOC_LOADER_ID){
+            progressBar.setRefreshing(true);
             return new CursorLoader(this, TeleContract.TeleEntry.TELE_CONTENT_URI,null,null,null,
                     TeleContract.TeleEntry.COLUMN_PRIORITY+" DESC");
         }
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-
+        progressBar.setRefreshing(false);
         if(data==null){
             return;
         }
@@ -102,29 +101,6 @@ public class MainActivity extends AppCompatActivity
         adapter.swapCursor(null);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SlideShowActivity.class);
-            startActivity(intent);
-//            scroolToTop(0,scrollView.getMeasuredHeight());
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
     private int numberOfColumns() {
@@ -149,13 +125,18 @@ public class MainActivity extends AppCompatActivity
 
     private void initializeWidgets(){
 
+        /*  Initialize floating add butto   */
+
         FloatingActionButton fab = findViewById(R.id.fab);
 
+        /*  Start new DocEdit Activity Intent or fragment */
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                Intent intent = new Intent(MainActivity.this,DocEditActivity.class);
                startActivity(intent);
+
+//               TODO: Start new fragment for tablets
             }
         });
 
@@ -168,7 +149,7 @@ public class MainActivity extends AppCompatActivity
         progressBar.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                progressBar.setRefreshing(false);
+                getSupportLoaderManager().restartLoader(DOC_LOADER_ID,null,MainActivity.this);
             }
         });
 

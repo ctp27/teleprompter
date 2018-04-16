@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
 
@@ -113,6 +114,7 @@ public class DocService extends IntentService {
         }
 
         String id = uri.getLastPathSegment();
+        SharedPreferenceUtils.setLastStoredId(this,Integer.parseInt(id));
 
 //        TODO: Insert into Firebase Cloud Database
     }
