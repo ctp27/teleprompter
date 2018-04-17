@@ -143,6 +143,10 @@ public class DocEditActivityFragment extends Fragment
         if(thisDoc!=null){
             titleText.setText(thisDoc.getTitle());
             textBody.setText(thisDoc.getText());
+            textBody.requestFocus();
+            if(savedInstanceState==null){
+                textBody.setSelection(thisDoc.getText().length());
+            }
         }
 
         updateSeekbarValues();
@@ -230,9 +234,6 @@ public class DocEditActivityFragment extends Fragment
         outState.putInt(BUNDLE_TEXT_COLOR,textColor);
         outState.putInt(BUNDLE_BACKGROUND_COLOR,backgroundColor);
 
-//        if(thisDoc!=null) {
-//            outState.putParcelable(BUNDLE_DATA_OBJECT, thisDoc);
-//        }
     }
 
     @Override
@@ -314,7 +315,6 @@ public class DocEditActivityFragment extends Fragment
                 /* New doc and orientation not changed. Set it as new doc! */
                 thisDoc.setNew(true);
             }
-
 
         }else {
             /* if it was a new doc returning from slideshow */

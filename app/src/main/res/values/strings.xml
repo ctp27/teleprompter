@@ -17,5 +17,6 @@
     <string name="scroll_speed_label">Scroll Speed</string>
     <string name="slide_show_play_btn_label">Play</string>
     <string name="slide_show_pause_button">Pause</string>
+    <string name="countdown_start">3</string>
 
 </resources>

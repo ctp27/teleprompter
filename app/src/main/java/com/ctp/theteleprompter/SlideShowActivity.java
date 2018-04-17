@@ -3,22 +3,21 @@ package com.ctp.theteleprompter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ctp.theteleprompter.model.TeleSpec;
+import com.ctp.theteleprompter.ui.SlideShowScrollView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +26,8 @@ import butterknife.ButterKnife;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class SlideShowActivity extends AppCompatActivity {
+public class SlideShowActivity extends AppCompatActivity
+            implements SlideShowScrollView.ScrollViewListener{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -39,12 +39,16 @@ public class SlideShowActivity extends AppCompatActivity {
      * user interaction before hiding the system UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    private static final int SCROLL_START_DELAY_MILLIS = 6000;
 
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
+
+    public static final String INTENT_PARCELABLE_EXTRA_KEY = "parcel-data-key";
+
     private final Handler mHideHandler = new Handler();
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -112,13 +116,11 @@ public class SlideShowActivity extends AppCompatActivity {
     };
 
 
-    public static final String INTENT_PARCELABLE_EXTRA_KEY = "parcel-data-key";
-    private static final int ANIMATION_DELAY_MILLIS = 25;
-    private static final int ANIMATION_SCROLL_CONSTANT =1;
+
 
 
     @BindView(R.id.slide_show_scroller)
-    ScrollView scrollView;
+    SlideShowScrollView scrollView;
 
     @BindView(R.id.slide_show_pause)
     Button pauseButton;
@@ -132,6 +134,18 @@ public class SlideShowActivity extends AppCompatActivity {
     @BindView(R.id.slide_show_bg)
     FrameLayout slideShowBackgroundView;
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.countdown_view)
+    FrameLayout countDownView;
+
+    @BindView(R.id.countdown_text)
+    TextView countDownText;
+
+    @BindView(R.id.ui_control_container)
+    LinearLayout scrollContainer;
+
     private String content;
     private boolean isPlaying;
 
@@ -141,13 +155,23 @@ public class SlideShowActivity extends AppCompatActivity {
     private AnimatorSet animators;
     private Handler animationHandler;
     private AnimationRunnable animationRunnable;
+    private boolean isFirstTime=false;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slide_show);
+
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if(savedInstanceState == null){
+            isFirstTime = true;
+        }
+
 //        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(3));
         TeleSpec teleSpec=null;
 
@@ -156,6 +180,10 @@ public class SlideShowActivity extends AppCompatActivity {
 
             teleSpec = intent.getParcelableExtra(INTENT_PARCELABLE_EXTRA_KEY);
         }
+
+//        textView.setScaleX(-1);
+//        textView.setScaleY(1);
+//        textView.setTranslationX(1);
 
 
         mVisible = true;
@@ -171,6 +199,16 @@ public class SlideShowActivity extends AppCompatActivity {
             }
         });
 
+
+        scrollContainer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                toggle();
+                return true;
+            }
+        });
+
+
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
@@ -185,13 +223,15 @@ public class SlideShowActivity extends AppCompatActivity {
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                animationHandler.removeCallbacks(animationRunnable);
-                showPlayButton();
+               stopScrollAnimation();
             }
         });
 
+        scrollView.setScrollViewListener(this);
+
 
         ActionBar actionBar = getSupportActionBar();
+
         if(teleSpec!=null){
             content = teleSpec.getContent();
             contentView.setText(content);
@@ -199,17 +239,11 @@ public class SlideShowActivity extends AppCompatActivity {
             setSlideShowFontSize(teleSpec.getFontSize());
             slideShowBackgroundView.setBackgroundColor(teleSpec.getBackgroundColor());
             setAnimationSpeed(teleSpec.getScrollSpeed());
-            if(actionBar!=null) {
-                actionBar.setBackgroundDrawable(new ColorDrawable(teleSpec.getBackgroundColor()));
-                actionBar.setTitle(teleSpec.getTitle());
-
-            }
-
+            getSupportActionBar().setTitle(teleSpec.getTitle());
         }
 
-
-
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -225,7 +259,7 @@ public class SlideShowActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startScrollAnimation();
+        startCountdown();
     }
 
     @Override
@@ -279,41 +313,34 @@ public class SlideShowActivity extends AppCompatActivity {
 
 
 
+    private void startCountdown(){
+        showCountDownView();
+        new Handler().postDelayed(new CountdownRunnable(),2000);
+    }
 
     private void startScrollAnimation(){
 //        scrollView.fullScroll(ScrollView.FOCUS_UP);
         int y = scrollView.getScrollY();
+        scrollView.setScrollable(false);
         animationHandler = new Handler();
         animationRunnable = new AnimationRunnable(y);
-        animationHandler.postDelayed(animationRunnable,animationDelayMillis);
+        animationHandler.postDelayed(animationRunnable,SCROLL_START_DELAY_MILLIS);
         showPauseButton();
-
-        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-                if (scrollView != null) {
-                    if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
-                        //scroll view is at bottom
-                        animationHandler.removeCallbacks(animationRunnable);
-                        showPlayButton();
-                        Log.d("blah","Ended animation");
-
-                    } else {
-                        //scroll view is not at bottom
-
-                    }
-                }
-            }
-        });
-
 
 
 
     }
+
+    private void stopScrollAnimation(){
+        animationHandler.removeCallbacks(animationRunnable);
+        scrollView.setScrollable(true);
+        showPlayButton();
+    }
+
     private class AnimationRunnable implements Runnable {
         private int scrollTo;
 
-        public AnimationRunnable(int to){
+        AnimationRunnable(int to){
             scrollTo = to;
         }
 
@@ -326,6 +353,49 @@ public class SlideShowActivity extends AppCompatActivity {
         }
     }
 
+
+    private class CountdownRunnable implements Runnable{
+
+
+        @Override
+        public void run() {
+           int count = Integer.parseInt(countDownText.getText().toString());
+           if(count>1){
+               count--;
+               countDownText.setText(Integer.toString(count));
+               new Handler().postDelayed(new CountdownRunnable(),1000);
+           }else {
+               countDownText.setText(getString(R.string.countdown_start));
+               hideCountDownView();
+               startScrollAnimation();
+           }
+
+
+        }
+    }
+
+    @Override
+    public void onScrollChanged(SlideShowScrollView scrollView, int x, int y, int oldx, int oldy) {
+        View view = (View) scrollView.getChildAt(scrollView.getChildCount() - 1);
+        int diff = (view.getBottom() - (scrollView.getHeight() + scrollView.getScrollY()));
+        if(diff <=40) {
+//            Log.d("blah","scroll bottom reached");
+            if(animationHandler!=null) {
+                stopScrollAnimation();
+            }
+        }
+    }
+
+
+
+    private void showCountDownView(){
+        countDownView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideCountDownView(){
+        countDownView.setVisibility(View.GONE);
+
+    }
 
     private void showPauseButton(){
         playButton.setVisibility(View.GONE);
@@ -343,27 +413,27 @@ public class SlideShowActivity extends AppCompatActivity {
 
         switch (scrollSpeed){
             case 0:
-                animationDelayMillis = 75;
+                animationDelayMillis = 25;
                 scrollOffset = 1;
                 break;
             case 1:
                 animationDelayMillis = 25;
-                scrollOffset = 1;
+                scrollOffset = 2;
                 break;
 
             case 2:
-                animationDelayMillis = 50;
+                animationDelayMillis = 25;
                 scrollOffset = 3;
                 break;
 
             case 3:
                 animationDelayMillis = 25;
-                scrollOffset = 3;
+                scrollOffset = 4;
                 break;
 
             case 4:
                 animationDelayMillis = 25;
-                scrollOffset = 4;
+                scrollOffset = 5;
                 break;
         }
 
@@ -398,69 +468,4 @@ public class SlideShowActivity extends AppCompatActivity {
 
     }
 
-
-
-
-//        textView.setScaleX(-1);
-//        textView.setScaleY(1);
-//        textView.setTranslationX(1);
-
-
-//    public void scrollToBotom(){
-//        scrollView.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-//            }
-//        },100L);
-//    }
-//
-//    public void scroolToTop(int x, int y) {
-//        ObjectAnimator xTranslate = ObjectAnimator.ofInt(scrollView, "scrollX", x);
-//        final ObjectAnimator yTranslate = ObjectAnimator.ofInt(scrollView, "scrollY", 1000000);
-//
-//        final AnimatorSet animators = new AnimatorSet();
-//        animators.setDuration(1000000L);
-//        animators.playTogether(xTranslate, yTranslate);
-//        animators.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animator) {
-//
-//            }
-//        });
-//        animators.start();
-//
-//        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-//            @Override
-//            public void onScrollChanged() {
-//                if (scrollView != null) {
-//                    if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
-//                        //scroll view is at bottom
-//                        animators.cancel();
-//                        animators.end();
-//                        Log.d("blah","Ended animation");
-//
-//                    } else {
-//                        //scroll view is not at bottom
-//
-//                    }
-//                }
-//            }
-//        });
-//    }
 }

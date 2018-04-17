@@ -30,6 +30,14 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="FullScreenThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorWhite</item>
+        <item name="colorPrimaryDark">@color/black_overlay</item>
+        <item name="colorAccent">@color/colorWhite</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
 
 
@@ -41,7 +49,7 @@
         <!--<item name="windowActionBarOverlay">true</item>-->
     </style>
 
-    <style name="FullscreenTheme" parent="AppTheme">
+    <style name="FullscreenTheme" parent="FullScreenThemeBase">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>

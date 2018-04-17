@@ -34,7 +34,8 @@
             android:name=".DocEditActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/editDocTheme">
+            android:theme="@style/editDocTheme"
+            android:windowSoftInputMode="adjustPan"> 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
