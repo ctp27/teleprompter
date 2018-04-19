@@ -30,7 +30,8 @@ import butterknife.OnClick;
 
 public class DocEditActivityFragment extends Fragment
             implements TextColorDialogFragment.TextColorDialogCallbacks,
-                        SeekBar.OnSeekBarChangeListener{
+                        SeekBar.OnSeekBarChangeListener
+                        {
 
 
     private static final String BUNDLE_TEXT_COLOR = "bundle_text-color";
@@ -75,19 +76,27 @@ public class DocEditActivityFragment extends Fragment
     private boolean orientationChanged = false;
     private int textColor;
     private int backgroundColor;
-    private int speedNumber=1;
-    private int fontSize=1;
+    private int speedNumber;
+    private int fontSize;
+    private boolean isTextMirrored;
     private boolean returnFromSlideshow=false;
     private Doc thisDoc=null;
+    String userId;
+    private boolean isPerisited;
 
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        userId = SharedPreferenceUtils.getPrefUserId(getContext());
+        speedNumber = SharedPreferenceUtils.getDefaultScrollSpeed(getContext());
+        fontSize = SharedPreferenceUtils.getDefaultFontSize(getContext());
         textColor = SharedPreferenceUtils.getDefaultTextColor(getContext());
         backgroundColor = SharedPreferenceUtils.getDefaultBackgroundColor(getContext());
+
+        isPerisited = false;
+
 
         Bundle b = getArguments();
         if(b.containsKey(DocEditActivity.EXTRA_PARCEL_KEY)){
@@ -140,16 +149,19 @@ public class DocEditActivityFragment extends Fragment
         fontSizeBar.setOnSeekBarChangeListener(this);
 
 
-        if(thisDoc!=null){
-            titleText.setText(thisDoc.getTitle());
-            textBody.setText(thisDoc.getText());
-            textBody.requestFocus();
-            if(savedInstanceState==null){
-                textBody.setSelection(thisDoc.getText().length());
-            }
+
+        titleText.setText(thisDoc.getTitle());
+        textBody.setText(thisDoc.getText());
+        textBody.requestFocus();
+
+        if(savedInstanceState==null){
+            textBody.setSelection(thisDoc.getText().length());
         }
 
-        updateSeekbarValues();
+
+        setScrollSpeed();
+        setFontSize();
+
 
         return v;
     }
@@ -173,6 +185,7 @@ public class DocEditActivityFragment extends Fragment
         Intent intent = new Intent(getContext(), SlideShowActivity.class);
         intent.putExtra(SlideShowActivity.INTENT_PARCELABLE_EXTRA_KEY,teleSpec);
         startActivity(intent);
+
 
     }
 
@@ -251,12 +264,22 @@ public class DocEditActivityFragment extends Fragment
 
     }
 
+    private void setScrollSpeed(){
+        scrollSpeedBar.setProgress(speedNumber);
+        speedBarTextView.setText(Integer.toString(speedNumber+1));
+    }
+
+    private void setFontSize(){
+        fontSizeBar.setProgress(fontSize);
+        fontSizeTextView.setText(getFontSizeDisplayStringFromProgress(fontSize));
+    }
+
     private void updateSeekbarValues(){
 
         speedNumber = scrollSpeedBar.getProgress();
-        speedBarTextView.setText(Integer.toString(speedNumber+1));
+        setScrollSpeed();
         fontSize = fontSizeBar.getProgress();
-        fontSizeTextView.setText(getFontSizeDisplayStringFromProgress(fontSize));
+        setFontSize();
     }
 
 
@@ -266,11 +289,11 @@ public class DocEditActivityFragment extends Fragment
             case 0:
                 return "S";
             case 1:
-                return "N";
-            case 2:
                 return "M";
-            case 3:
+            case 2:
                 return "L";
+            case 3:
+                return "XL";
                 default:
                     return "S";
         }
@@ -280,11 +303,40 @@ public class DocEditActivityFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
+        if(getActivity().isFinishing()) {
             persistDoc();
+            isPerisited = true;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(getActivity().isFinishing() && !isPerisited){
+            persistDoc();
+        }
+
+        Log.d(TAG,"Destroyed Fragment View");
+
+    }
+
+      @Override
+      public void onDestroy() {
+           super.onDestroy();
+           Log.d(TAG,"onDestroy Fragment");
+
+      }
+
+   @Override
+   public void onDetach() {
+     super.onDetach();
+        Log.d(TAG,"Detach called");
     }
 
 
-    /**
+
+
+                            /**
      * Private method which handles Doc persistence when the user leaves the
      * DocEditActivityFragment. Handles all cases and conditions.
      *
@@ -296,70 +348,52 @@ public class DocEditActivityFragment extends Fragment
         String body = textBody.getText().toString();
 
 
-        /*  If title and body are empty or filled with white spaces.. Abort! */
-        if(title.trim().isEmpty() && body.trim().isEmpty()){
-            return ;
-        }
 
-        /*  is thisDoc, null? if so its a new doc, create a new doc */
-        if(thisDoc == null){
-            thisDoc = new Doc();
+      if(thisDoc.isNew()){
 
-            if(orientationChanged){
-                /* New doc and returning from orientation change, Dont set as new!
-                * This doc is not new, was persisted before orientation change.
-                * Get the stored id, and set it */
-               thisDoc.setNew(false);
+       /*   The doc is new  */
 
-            }else {
-                /* New doc and orientation not changed. Set it as new doc! */
-                thisDoc.setNew(true);
+            if(!title.trim().isEmpty() && !body.trim().isEmpty()){
+
+                /*  If title and body are both not empty, populate the object and insert it*/
+                thisDoc.setUserId(SharedPreferenceUtils.getPrefUserId(getContext()));
+                thisDoc.setTitle(title);
+                thisDoc.setText(body);
+                Log.d(TAG,"Inserting new Doc");
+                DocService.insertDoc(getContext(),thisDoc);
+
             }
 
-        }else {
-            /* if it was a new doc returning from slideshow */
-//            if (returnFromSlideshow){
-//                /*  Set the id since it was already saved before slideshow  */
-//                thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
-//                Log.d(TAG,"Storing id in doc");
-//            }
+      }
+      else {
 
-            /*  Doc not null, check if title and body are same as before
-             * If same, Abort! no need to update */
+            /*  if title and body are empty, delete this doc    */
+          if(title.trim().isEmpty() && body.trim().isEmpty()){
 
-            if(title.equals(thisDoc.getTitle()) && body.equals(thisDoc.getText())){
-                Log.d(TAG,"Nothing changed");
-                return ;
-            }
-        }
+              DocService.deleteDoc(getContext(),thisDoc);
+              Log.d(TAG,"Deleting old doc, coz its empty");
+
+          }else{
+                /*  if title and body are not the same, update the doc */
+              if(title.equals(thisDoc.getTitle()) && body.equals(thisDoc.getText())) {
+                  return;
+              }
+
+              thisDoc.setText(body);
+              thisDoc.setTitle(title);
+              Log.d(TAG,"Updating doc with id "+thisDoc.getId());
+              DocService.updateDoc(getContext(),thisDoc);
+          }
+
+
+      }
+
 
         /*  Populate thisDoc object with the title and body */
-        thisDoc.setTitle(title);
-        thisDoc.setText(body);
-
-        thisDoc.setUsername(SharedPreferenceUtils.getPrefUsername(getContext()));
-
-        if(thisDoc.isNew()){
-            /*  Doc is new! so Insert it    */
-            DocService.insertDoc(getContext(),thisDoc);
-            Log.d(TAG,"Inserting new doc with id "+thisDoc.getId());
-        }
-        else {
-            /*  Doc already exists, update it!  */
-            if(thisDoc.getId()==-1){
-                thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
-            }
-            DocService.updateDoc(getContext(),thisDoc);
-            Log.d(TAG,"Updating the doc with id "+thisDoc.getId());
-        }
 
 
 
     }
-
-
-
-
 
 
 }

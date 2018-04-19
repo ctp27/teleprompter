@@ -10,25 +10,28 @@ import android.support.annotation.Nullable;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class DocService extends IntentService {
 
 
     public static final String ACTION_UPDATE = "action-update-doc";
     public static final String ACTION_DELETE = "action-delete-doc";
-    public static final String PERSIST_ACTION_BROADCAST = "com.ctp.theteleprompter.CARD_SERVICE";
-    public static final String BROADCAST_ACTION_EXTRA = "broadcast-action-extra";
+
 
     private static final String ACTION_INSERT = "action-insert-doc";
-    private static final String ACTION_QUERY = "action-query-doc";
+    private static final String ACTION_CHANGE_POSITION = "action-query-doc";
     private static final String EXTRA_KEY = "key_extra_key";
-    public static final String EXTRA_OBJECT_ ="old -position";
 
+    public static final String TAG = DocService.class.getSimpleName();
+    private static final String DATABASE_CHILD_DOCS = "docs";
 
     public DocService() {
         super(DocService.class.getSimpleName());
     }
 
+    private static FirebaseDatabase mDb;
 
     public static void insertDoc(Context context, Doc doc){
         Intent intent = new Intent(context,DocService.class);
@@ -81,41 +84,100 @@ public class DocService extends IntentService {
 
         getContentResolver().delete(uri,null,null);
 
+        doc.setUserId(SharedPreferenceUtils.getPrefUserId(this));
 
 
-//        TODO: Delete from firebase database
+        /*  Delete from Firebase Database   */
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(doc.getUserId())
+                .child(Integer.toString(doc.getId()))
+                .removeValue();
+
 
     }
+
+
 
     private void handleActionUpdateDoc(Intent intent) {
 
         Doc doc = intent.getParcelableExtra(EXTRA_KEY);
 
 
+
         ContentValues contentValues = doc.getContentValues();
+
+        getContentResolver().delete(TeleContract.TeleEntry.TELE_CONTENT_URI,
+                TeleContract.TeleEntry._ID+"=?",
+                new String[]{Integer.toString(doc.getId())});
+
+        getContentResolver().insert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
 
         getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
                 TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
+
 
 
 //        TODO: Update on FirebaseDatabase
 
     }
 
+
+    /**
+     * Inserts the new Doc into the local database and the Firebase Realtime Database
+     * @param intent The intent passed while calling the service
+     */
+
     private void handleActionInsertDoc(Intent intent) {
 
+        /*  Retrieve the doc object from Intent Parcel */
         Doc doc = intent.getParcelableExtra(EXTRA_KEY);
+
+        /*  Get ContentValues for this doc  */
         ContentValues contentValues = doc.getContentValues();
 
+        /*  Insert the doc in Local Database    */
         Uri uri = getContentResolver().insert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
 
+        /*  If uri is null, error occured, return*/
         if(uri==null) {
             return;
         }
 
-        String id = uri.getLastPathSegment();
-        SharedPreferenceUtils.setLastStoredId(this,Integer.parseInt(id));
 
-//        TODO: Insert into Firebase Cloud Database
+        /* Obtain the local database Id of the doc from the returned Uri */
+        String idString = uri.getLastPathSegment();
+        int id = Integer.parseInt(idString);
+
+        /*  Update the last stored Id, for updates on orientation change    */
+        SharedPreferenceUtils.setLastStoredId(this,id);
+
+
+        /*  Prepare doc object for cloud database  */
+        /*  Set the same id as the local database   */
+        /*  Set the user ID of this doc (User Id is primary key for the user online) */
+        /*  Set the priority to be same as the id for a new doc */
+//        doc.setUserId(SharedPreferenceUtils.getPrefUserId(this));
+        doc.setId(id);
+        doc.setPriority(id);
+
+
+        /*  Insert the doc into the firebase database   */
+
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(doc.getUserId())
+                .child(idString)
+                .setValue(doc);
     }
+
+
+    private DatabaseReference getFirebaseDatabaseReference(){
+        if(mDb==null) {
+            mDb = FirebaseDatabase.getInstance();
+            mDb.setPersistenceEnabled(true);
+        }
+        return mDb.getReference();
+    }
+
 }

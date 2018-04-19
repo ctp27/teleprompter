@@ -8,17 +8,24 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.ctp.theteleprompter.data.TeleContract;
+import com.google.firebase.database.Exclude;
+
 
 public class Doc implements Parcelable {
 
     private int id=-1;
-    private int cloudId;
     private String title;
     private String text;
     private int priority=-1;
-    private String username;
 
+    @Exclude
+    private String userId;
+
+    @Exclude
     private boolean isNew;
+
+    @Exclude
+    private int cloudId;
 
 
 
@@ -33,7 +40,7 @@ public class Doc implements Parcelable {
         title = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TITLE));
         text = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TEXT));
         priority = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_PRIORITY));
-        username = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_USER_NAME));
+        userId = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_USER_NAME));
         isNew = false;
     }
 
@@ -42,6 +49,7 @@ public class Doc implements Parcelable {
         return id;
     }
 
+    @Exclude
     public int getCloudId() {
         return cloudId;
     }
@@ -54,8 +62,9 @@ public class Doc implements Parcelable {
         return text;
     }
 
-    public String getUsername() {
-        return username;
+    @Exclude
+    public String getUserId() {
+        return userId;
     }
 
     public int getPriority() {
@@ -82,10 +91,11 @@ public class Doc implements Parcelable {
         this.priority = priority;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
+    @Exclude
     public boolean isNew() {
         return isNew;
     }
@@ -94,16 +104,18 @@ public class Doc implements Parcelable {
         isNew = aNew;
     }
 
+    @Exclude
     public Uri getUri() {
         return ContentUris.withAppendedId(TeleContract.TeleEntry.TELE_CONTENT_URI, id);
     }
 
+    @Exclude
     public ContentValues getContentValues(){
         ContentValues contentValues = new ContentValues();
         contentValues.put(TeleContract.TeleEntry.COLUMN_TEXT,text);
         contentValues.put(TeleContract.TeleEntry.COLUMN_TITLE,title);
 
-        if(username!=null) {
+        if(userId !=null) {
             contentValues.put(TeleContract.TeleEntry.COLUMN_USER_NAME, "LOCAL");
         }
 
@@ -124,11 +136,12 @@ public class Doc implements Parcelable {
         title = in.readString();
         text = in.readString();
         priority = in.readInt();
-        username = in.readString();
+        userId = in.readString();
         isNew = in.readByte()!=0;
 
     }
 
+    @Exclude
     public static final Creator<Doc> CREATOR = new Creator<Doc>() {
         @Override
         public Doc createFromParcel(Parcel parcel) {
@@ -140,12 +153,13 @@ public class Doc implements Parcelable {
             return new Doc[size];
         }
     };
-
+    @Exclude
     @Override
     public int describeContents() {
         return 0;
     }
 
+    @Exclude
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
@@ -153,7 +167,7 @@ public class Doc implements Parcelable {
         parcel.writeString(title);
         parcel.writeString(text);
         parcel.writeInt(priority);
-        parcel.writeString(username);
+        parcel.writeString(userId);
         parcel.writeByte((byte) (isNew ? 1 : 0));
     }
 }

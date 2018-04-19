@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <SwitchPreference
+        android:defaultValue="@bool/pref_mirror_text_default"
+        android:key="@string/pref_mirror_text_key"
+        android:summaryOn="@string/pref_mirror_text_summary_on"
+        android:summaryOff="@string/pref_mirror_text_summary_off"
+        android:title="@string/pref_mirror_text_title"/>
+
+    <ListPreference
+        android:defaultValue="@string/pref_fontsize_medium_value"
+        android:entries="@array/pref_font_size_labels"
+        android:entryValues="@array/pref_font_size_values"
+        android:key="@string/pref_fontsize_key"
+        android:title="@string/pref_fontsize_title"
+        />
+
+
+    <ListPreference
+        android:defaultValue="@string/pref_speed_value_2"
+        android:entries="@array/pref_speed_labels"
+        android:entryValues="@array/pref_speed_values"
+        android:key="@string/pref_speed_key"
+        android:title="@string/pref_speed_title"
+        />
+
+
+</PreferenceScreen>

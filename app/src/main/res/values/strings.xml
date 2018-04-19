@@ -18,5 +18,74 @@
     <string name="slide_show_play_btn_label">Play</string>
     <string name="slide_show_pause_button">Pause</string>
     <string name="countdown_start">3</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+
+    <!--    Preference Keys     -->
+    <string name="pref_text_color_key" translatable="false">preff_text_color_key</string>
+    <string name="pref_background_color_key" translatable="false">preff_bg_color_key</string>
+    <string name="pref_fontsize_key" translatable="false">pref_font_size_key_string</string>
+    <string name="pref_mirror_text_key" translatable="false">pref_mirror_text_key</string>
+    <string name="pref_speed_key" translatable="false">pref_speed_key_string</string>
+    <string name="pref_uid_key" translatable="false">pref_uid_key_string</string>
+    <string name="pref_user_name_key" translatable="false">pref_username_key_string</string>
+    <string name="pref_email_key" translatable="false">pref_email_key_string</string>
+    <string name="pref_last_id_key" translatable="false">pref_last_id_key_string</string>
+
+
+
+    <string name="action_logout">Logout</string>
+
+    <string name="pref_fontsize_label_small">Small</string>
+    <string name="pref_fontsize_label_medium">Medium</string>
+    <string name="pref_fontsize_label_large">Large</string>
+    <string name="pref_fontsize_label_xlarge">Extra Large</string>
+
+
+
+    <string name="pref_speed_label_1">1</string>
+    <string name="pref_speed_label_2">2</string>
+    <string name="pref_speed_label_3">3</string>
+    <string name="pref_speed_label_4">4</string>
+    <string name="pref_speed_label_5">5</string>
+
+
+    <string name="pref_fontsize_small_value">0</string>
+    <string name="pref_fontsize_medium_value">1</string>
+    <string name="pref_fontsize_large_value">2</string>
+    <string name="pref_fontsize_xlarge_value">3</string>
+
+    <string name="pref_speed_value_1">0</string>
+    <string name="pref_speed_value_2">1</string>
+    <string name="pref_speed_value_3">2</string>
+    <string name="pref_speed_value_4">3</string>
+    <string name="pref_speed_value_5">4</string>
+
+
+
+    <string name="pref_fontsize_title">Default Font Size</string>
+    <string name="pref_mirror_text_title">Mirror Text</string>
+    <string name="pref_speed_title">Default Scroll Speed</string>
+    <string name="pref_mirror_text_summary_on">Mirrored</string>
+    <string name="pref_mirror_text_summary_off">Not Mirrored</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="the_teleprompter">The Teleprompter</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="full_name">Full name</string>
 
 </resources>

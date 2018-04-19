@@ -7,10 +7,14 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -18,15 +22,19 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.ctp.theteleprompter.adapters.DocGridAdapter;
+import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.services.DocService;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -53,6 +61,12 @@ public class MainActivity extends AppCompatActivity
     @BindColor(R.color.colorDanger)
     int colorDanger;
 
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+
 
     private DocGridAdapter adapter;
 
@@ -62,10 +76,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_nav_drawer);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
         initializeWidgets();
 
@@ -102,6 +119,25 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+               drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(this,LoginActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -134,6 +170,12 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                Intent intent = new Intent(MainActivity.this,DocEditActivity.class);
+               Doc doc = new Doc();
+               doc.setTitle("");
+               doc.setText("");
+               doc.setNew(true);
+               doc.setUserId(SharedPreferenceUtils.getPrefUserId(MainActivity.this));
+               intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY,doc);
                startActivity(intent);
 
 //               TODO: Start new fragment for tablets
@@ -223,6 +265,27 @@ public class MainActivity extends AppCompatActivity
             }
         }).attachToRecyclerView(docGridView);
 
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch (id){
+                    case R.id.nav_settings:
+                        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+                        startActivity(intent);
+                        drawerLayout.closeDrawers();
+                        break;
+                    case R.id.nav_logout:
+                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                        mAuth.signOut();
+                        Intent theIntent = new Intent(MainActivity.this,LoginActivity.class);
+                        startActivity(theIntent);
+                        break;
+                }
+                return false;
+            }
+        });
+
 
         docGridView.setAdapter(adapter);
         MobileAds.initialize(this,
@@ -231,8 +294,6 @@ public class MainActivity extends AppCompatActivity
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
-//        intentFilter = new IntentFilter();
-//        intentFilter.addAction(DocService.PERSIST_ACTION_BROADCAST);
 
     }
 
@@ -251,35 +312,5 @@ public class MainActivity extends AppCompatActivity
 //        registerReceiver(broadcastReceiver,intentFilter);
 
     }
-
-//    private class CardServiceBroadcastReceiver extends BroadcastReceiver{
-//
-//        public CardServiceBroadcastReceiver() {
-//            initialize();
-//        }
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//
-//            String type= intent.getStringExtra(DocService.BROADCAST_ACTION_EXTRA);
-//            if(type.equals(DocService.ACTION_UPDATE)){
-//                Doc doc = intent.getParcelableExtra(DocService.EXTRA_OBJECT_);
-//                adapter.move(doc.getPriority(),doc.getOldPriority());
-//            }
-//            else if(type.equals(DocService.ACTION_DELETE)) {
-//                Doc doc = intent.getParcelableExtra(DocService.EXTRA_OBJECT_);
-//                adapter.deletePosition(doc.getPriority());
-//            }
-//
-//
-//
-//        }
-//
-//
-//        private void initialize(){
-//
-//
-//        }
-//    }
 
 }

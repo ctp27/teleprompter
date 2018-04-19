@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.model.TeleSpec;
 import com.ctp.theteleprompter.ui.SlideShowScrollView;
 
@@ -157,6 +158,8 @@ public class SlideShowActivity extends AppCompatActivity
     private AnimationRunnable animationRunnable;
     private boolean isFirstTime=false;
 
+    private boolean isTextMirrored;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -167,7 +170,7 @@ public class SlideShowActivity extends AppCompatActivity
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        isTextMirrored = SharedPreferenceUtils.isTextMirrored(this);
         if(savedInstanceState == null){
             isFirstTime = true;
         }
@@ -181,9 +184,11 @@ public class SlideShowActivity extends AppCompatActivity
             teleSpec = intent.getParcelableExtra(INTENT_PARCELABLE_EXTRA_KEY);
         }
 
-//        textView.setScaleX(-1);
-//        textView.setScaleY(1);
-//        textView.setTranslationX(1);
+        if(isTextMirrored) {
+            contentView.setScaleX(-1);
+            contentView.setScaleY(1);
+            contentView.setTranslationX(1);
+        }
 
 
         mVisible = true;
@@ -241,6 +246,8 @@ public class SlideShowActivity extends AppCompatActivity
             setAnimationSpeed(teleSpec.getScrollSpeed());
             getSupportActionBar().setTitle(teleSpec.getTitle());
         }
+
+
 
     }
 
