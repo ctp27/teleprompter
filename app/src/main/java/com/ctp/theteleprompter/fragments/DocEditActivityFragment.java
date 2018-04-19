@@ -36,8 +36,8 @@ public class DocEditActivityFragment extends Fragment
 
     private static final String BUNDLE_TEXT_COLOR = "bundle_text-color";
     private static final String BUNDLE_BACKGROUND_COLOR = "bundle-background-color" ;
-    private static final String BUNDLE_SPEED_NUMBER = "bundle_text-color";
-    private static final String BUNDLE_FONT_SIZE_TEXT = "bundle-background-color" ;
+    private static final String BUNDLE_TEXT_STORE = "bundle_text-store";
+    private static final String BUNDLE_TITLE_STORE = "bundle-title-store" ;
     private static final String BUNDLE_DATA_OBJECT = "bundle_data_object";
 
     private static final String TAG = DocEditActivityFragment.class.getSimpleName();
@@ -84,6 +84,9 @@ public class DocEditActivityFragment extends Fragment
     String userId;
     private boolean isPerisited;
 
+    private String titleStore;
+    private String textStore;
+
 
 
     @Override
@@ -101,14 +104,17 @@ public class DocEditActivityFragment extends Fragment
         Bundle b = getArguments();
         if(b.containsKey(DocEditActivity.EXTRA_PARCEL_KEY)){
             thisDoc = b.getParcelable(DocEditActivity.EXTRA_PARCEL_KEY);
+            textStore = thisDoc.getText();
+            titleStore = thisDoc.getTitle();
         }
 
         if(savedInstanceState!=null){
             textColor = savedInstanceState.getInt(BUNDLE_TEXT_COLOR);
             backgroundColor = savedInstanceState.getInt(BUNDLE_BACKGROUND_COLOR);
 //            thisDoc = savedInstanceState.getParcelable(BUNDLE_DATA_OBJECT);
+            textStore = savedInstanceState.getString(BUNDLE_TEXT_STORE);
+            titleStore = savedInstanceState.getString(BUNDLE_TITLE_STORE);
             orientationChanged = true;
-
             }
         }
 
@@ -244,6 +250,8 @@ public class DocEditActivityFragment extends Fragment
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString(BUNDLE_TITLE_STORE,titleText.getText().toString());
+        outState.putString(BUNDLE_TEXT_STORE,textBody.getText().toString());
         outState.putInt(BUNDLE_TEXT_COLOR,textColor);
         outState.putInt(BUNDLE_BACKGROUND_COLOR,backgroundColor);
 
@@ -303,94 +311,91 @@ public class DocEditActivityFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        if(getActivity().isFinishing()) {
-            persistDoc();
-            isPerisited = true;
+        if(thisDoc.isNew()){
+            persistNewDoc();
+        }
+        else {
+            persistOldDoc();
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if(getActivity().isFinishing() && !isPerisited){
-            persistDoc();
-        }
 
-        Log.d(TAG,"Destroyed Fragment View");
-
-    }
-
-      @Override
-      public void onDestroy() {
-           super.onDestroy();
-           Log.d(TAG,"onDestroy Fragment");
-
-      }
-
-   @Override
-   public void onDetach() {
-     super.onDetach();
-        Log.d(TAG,"Detach called");
-    }
-
-
-
-
-                            /**
+    /**
      * Private method which handles Doc persistence when the user leaves the
      * DocEditActivityFragment. Handles all cases and conditions.
      *
      */
-    private void persistDoc(){
 
-        /*  Get the text from the Edit view */
+    private void persistNewDoc(){
+
         String title = titleText.getText().toString();
         String body = textBody.getText().toString();
 
 
+        /*if title equals the old title and text equals the old text
+                return*/
+        if(titleStore.equals(title) && textStore.equals(body)){
+            Log.d(TAG,"Not going to persist, since its same as last persist");
+            return;
+        }
 
-      if(thisDoc.isNew()){
 
-       /*   The doc is new  */
+        if(title.trim().isEmpty() && body.trim().isEmpty() && orientationChanged){
 
-            if(!title.trim().isEmpty() && !body.trim().isEmpty()){
+            /*  If content has been changed and set to empty to empty after persisting it before
+            *       delete the doc  */
 
-                /*  If title and body are both not empty, populate the object and insert it*/
-                thisDoc.setUserId(SharedPreferenceUtils.getPrefUserId(getContext()));
+                thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
+                thisDoc.setCloudId(SharedPreferenceUtils.getLastStoredCloudId(getContext()));
+                DocService.deleteDoc(getContext(),thisDoc);
+                Log.d(TAG, "Content changed to empty after orientation. Delete the doc "+thisDoc.getId());
+                return;
+        }
+
+
+        if(!title.trim().isEmpty() || !body.trim().isEmpty()){
+            /*  If content is not the same, if content is changed after orientation
+            * change, update the doc created before orientation change  */
+            if(orientationChanged){
+                thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
+                thisDoc.setCloudId(SharedPreferenceUtils.getLastStoredCloudId(getContext()));
+                DocService.updateDoc(getContext(),thisDoc);
+                Log.d(TAG,"Content not changed to empty after orientation changed, update doc "+thisDoc.getId());
+            }
+            else {
+
+                /*  If content is not the same, and no orientation change, insert the doc */
                 thisDoc.setTitle(title);
                 thisDoc.setText(body);
-                Log.d(TAG,"Inserting new Doc");
+                thisDoc.setUserId(SharedPreferenceUtils.getPrefUserId(getContext()));
+                Log.d(TAG,"Content not same and not empty and not persisted before, insert doc "+thisDoc.getId());
                 DocService.insertDoc(getContext(),thisDoc);
-
             }
-
-      }
-      else {
-
-            /*  if title and body are empty, delete this doc    */
-          if(title.trim().isEmpty() && body.trim().isEmpty()){
-
-              DocService.deleteDoc(getContext(),thisDoc);
-              Log.d(TAG,"Deleting old doc, coz its empty");
-
-          }else{
-                /*  if title and body are not the same, update the doc */
-              if(title.equals(thisDoc.getTitle()) && body.equals(thisDoc.getText())) {
-                  return;
-              }
-
-              thisDoc.setText(body);
-              thisDoc.setTitle(title);
-              Log.d(TAG,"Updating doc with id "+thisDoc.getId());
-              DocService.updateDoc(getContext(),thisDoc);
-          }
+        }
 
 
-      }
+        textStore = body;
+        titleStore = title;
 
 
-        /*  Populate thisDoc object with the title and body */
+    }
 
+    private void persistOldDoc(){
+
+        String title = titleText.getText().toString();
+        String body = textBody.getText().toString();
+
+        if(titleStore.equals(title) && textStore.equals(body)){
+            Log.d(TAG,"Not going to persist, since its same as last persist");
+        }else {
+            Log.d(TAG, "Updating this old doc with Id "+thisDoc.getId());
+            thisDoc.setText(body);
+            thisDoc.setTitle(title);
+
+            DocService.updateDoc(getContext(),thisDoc);
+        }
+        textStore = body;
+        titleStore = title;
 
 
     }

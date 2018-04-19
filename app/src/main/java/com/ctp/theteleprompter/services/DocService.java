@@ -24,6 +24,8 @@ public class DocService extends IntentService {
     private static final String ACTION_CHANGE_POSITION = "action-query-doc";
     private static final String EXTRA_KEY = "key_extra_key";
 
+    private static final String DATABASE_DOC_CHILD_PRIORITY= "priority";
+
     public static final String TAG = DocService.class.getSimpleName();
     private static final String DATABASE_CHILD_DOCS = "docs";
 
@@ -56,6 +58,14 @@ public class DocService extends IntentService {
     }
 
 
+    public static void moveDocs(Context context, Doc doc){
+        Intent intent = new Intent(context,DocService.class);
+        intent.putExtra(EXTRA_KEY,doc);
+        intent.setAction(ACTION_CHANGE_POSITION);
+        context.startService(intent);
+    }
+
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
 
@@ -70,6 +80,9 @@ public class DocService extends IntentService {
                 break;
             case ACTION_DELETE:
                 handleActionDeleteDoc(intent);
+                break;
+            case ACTION_CHANGE_POSITION:
+                handleActionChangePosition(intent);
                 break;
         }
 
@@ -91,7 +104,7 @@ public class DocService extends IntentService {
         getFirebaseDatabaseReference()
                 .child(DATABASE_CHILD_DOCS)
                 .child(doc.getUserId())
-                .child(Integer.toString(doc.getId()))
+                .child(doc.getCloudId())
                 .removeValue();
 
 
@@ -111,10 +124,19 @@ public class DocService extends IntentService {
                 TeleContract.TeleEntry._ID+"=?",
                 new String[]{Integer.toString(doc.getId())});
 
-        getContentResolver().insert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
+        Uri uri = getContentResolver().insert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
 
-        getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
-                TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
+        String newId = uri.getLastPathSegment();
+        doc.setPriority(Integer.parseInt(newId));
+
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(doc.getUserId())
+                .child(doc.getCloudId())
+                .setValue(doc);
+
+//        getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
+//                TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
 
 
 
@@ -133,8 +155,18 @@ public class DocService extends IntentService {
         /*  Retrieve the doc object from Intent Parcel */
         Doc doc = intent.getParcelableExtra(EXTRA_KEY);
 
+        String cloudId = getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(doc.getUserId())
+                .push()
+                .getKey();
+
+        doc.setCloudId(cloudId);
+
         /*  Get ContentValues for this doc  */
         ContentValues contentValues = doc.getContentValues();
+
+
 
         /*  Insert the doc in Local Database    */
         Uri uri = getContentResolver().insert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
@@ -151,14 +183,13 @@ public class DocService extends IntentService {
 
         /*  Update the last stored Id, for updates on orientation change    */
         SharedPreferenceUtils.setLastStoredId(this,id);
-
+        SharedPreferenceUtils.setLastStoredCloudId(this,cloudId);
 
         /*  Prepare doc object for cloud database  */
         /*  Set the same id as the local database   */
         /*  Set the user ID of this doc (User Id is primary key for the user online) */
         /*  Set the priority to be same as the id for a new doc */
 //        doc.setUserId(SharedPreferenceUtils.getPrefUserId(this));
-        doc.setId(id);
         doc.setPriority(id);
 
 
@@ -167,8 +198,28 @@ public class DocService extends IntentService {
         getFirebaseDatabaseReference()
                 .child(DATABASE_CHILD_DOCS)
                 .child(doc.getUserId())
-                .child(idString)
+                .child(cloudId)
                 .setValue(doc);
+    }
+
+
+    private void handleActionChangePosition(Intent intent){
+
+        Doc doc = intent.getParcelableExtra(EXTRA_KEY);
+
+        ContentValues contentValues = doc.getContentValues();
+
+
+        getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
+                TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
+
+
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(doc.getUserId())
+                .child(doc.getCloudId())
+                .child(DATABASE_DOC_CHILD_PRIORITY)
+                .setValue(doc.getPriority());
     }
 
 
@@ -176,6 +227,8 @@ public class DocService extends IntentService {
         if(mDb==null) {
             mDb = FirebaseDatabase.getInstance();
             mDb.setPersistenceEnabled(true);
+
+            mDb.getReference("docs").keepSynced(true);
         }
         return mDb.getReference();
     }

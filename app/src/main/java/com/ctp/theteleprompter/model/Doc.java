@@ -24,8 +24,8 @@ public class Doc implements Parcelable {
     @Exclude
     private boolean isNew;
 
-    @Exclude
-    private int cloudId;
+
+    private String cloudId;
 
 
 
@@ -36,7 +36,7 @@ public class Doc implements Parcelable {
     public Doc(Cursor data){
 
         id = data.getInt(data.getColumnIndex(TeleContract.TeleEntry._ID));
-        cloudId = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_CLOUD_ID));
+        cloudId = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_CLOUD_ID));
         title = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TITLE));
         text = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TEXT));
         priority = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_PRIORITY));
@@ -44,14 +44,17 @@ public class Doc implements Parcelable {
         isNew = false;
     }
 
-
+    @Exclude
     public int getId() {
         return id;
     }
 
-    @Exclude
-    public int getCloudId() {
+    public String getCloudId() {
         return cloudId;
+    }
+
+    public void setCloudId(String cloudId) {
+        this.cloudId = cloudId;
     }
 
     public String getTitle() {
@@ -75,9 +78,7 @@ public class Doc implements Parcelable {
         this.id = id;
     }
 
-    public void setCloudId(int cloudId) {
-        this.cloudId = cloudId;
-    }
+
 
     public void setTitle(String title) {
         this.title = title;
@@ -116,10 +117,10 @@ public class Doc implements Parcelable {
         contentValues.put(TeleContract.TeleEntry.COLUMN_TITLE,title);
 
         if(userId !=null) {
-            contentValues.put(TeleContract.TeleEntry.COLUMN_USER_NAME, "LOCAL");
+            contentValues.put(TeleContract.TeleEntry.COLUMN_USER_NAME, userId);
         }
 
-        if(cloudId!=-1){
+        if(cloudId!=null){
             contentValues.put(TeleContract.TeleEntry.COLUMN_CLOUD_ID,cloudId);
         }
         if(priority!=-1){
@@ -132,7 +133,7 @@ public class Doc implements Parcelable {
 
     protected Doc(Parcel in) {
         id = in.readInt();
-        cloudId = in.readInt();
+        cloudId = in.readString();
         title = in.readString();
         text = in.readString();
         priority = in.readInt();
@@ -163,7 +164,7 @@ public class Doc implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
-        parcel.writeInt(cloudId);
+        parcel.writeString(cloudId);
         parcel.writeString(title);
         parcel.writeString(text);
         parcel.writeInt(priority);

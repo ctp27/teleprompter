@@ -92,6 +92,20 @@ public class SharedPreferenceUtils {
         editor.apply();
     }
 
+
+    public static void setLastStoredCloudId(Context context, String id){
+        String key = context.getString(R.string.pref_last_cloudId_key);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(key, id);
+        editor.apply();
+    }
+
+    public static String getLastStoredCloudId(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(context.getString(R.string.pref_last_cloudId_key),"-1");
+    }
+
     public static int getDefaultFontSize(Context context){
         String defaultValue = context.getString(R.string.pref_fontsize_medium_value);
         String fontSizeKey = context.getString(R.string.pref_fontsize_key);

@@ -247,6 +247,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         else {
 //            TODO: store his UId in preferences
 //            TODO: Sync his docs
+
             String userId = user.getUid();
             String email = user.getEmail();
             SharedPreferenceUtils.setPrefEmail(this,email);

@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity
                             int newPriority = orderedDocs.size()-i;
                             d.setPriority(newPriority);
 
-                            DocService.updateDoc(MainActivity.this,d);
+                            DocService.moveDocs(MainActivity.this,d);
 
                         }
 
