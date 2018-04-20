@@ -211,18 +211,7 @@ public class TeleContentProvider extends ContentProvider {
 
                         long _id = db.insert(TeleContract.TeleEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
-
-                            ContentValues cv = new ContentValues();
-                            cv.put(TeleContract.TeleEntry.COLUMN_PRIORITY,_id);
-
-                            String selection = TeleContract.TeleEntry._ID + " =?";
-                            String[] selectionArgs = new String[]{Long.toString(_id)};
-
-                            long _id2 = db.update(TeleContract.TeleEntry.TABLE_NAME,cv,selection,selectionArgs);
-
-                            if(_id2!=-1) {
                                 rowsInserted++;
-                            }
                         }
                     }
                     db.setTransactionSuccessful();

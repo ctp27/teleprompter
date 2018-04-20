@@ -1,13 +1,20 @@
 package com.ctp.theteleprompter;
 
+import android.app.ActivityOptions;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +23,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -25,12 +33,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ctp.theteleprompter.adapters.DocGridAdapter;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.services.DocService;
+import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -66,6 +76,12 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+
+    private SyncDocsReciever mSyncDocsReciever;
+
+    private IntentFilter intentFilter;
+
+
 
 
     private DocGridAdapter adapter;
@@ -151,11 +167,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDocClicked(Doc doc) {
+    public void onDocClicked(Doc doc, CardView view) {
+        Intent intent = new Intent(this, DocEditActivity.class);
+        intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY, doc);
 
-        Intent intent = new Intent(this,DocEditActivity.class);
-        intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY,doc);
-        startActivity(intent);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+            Bundle bundle = ActivityOptions.
+                    makeSceneTransitionAnimation(this).toBundle();
+            startActivity(intent,bundle);
+        }
+        else {
+
+            startActivity(intent);
+        }
 
     }
 
@@ -188,10 +212,11 @@ public class MainActivity extends AppCompatActivity
         docGridView.setLayoutManager(manager);
         adapter = new DocGridAdapter(this,null);
 
+
         progressBar.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getSupportLoaderManager().restartLoader(DOC_LOADER_ID,null,MainActivity.this);
+                startDocSync();
             }
         });
 
@@ -234,34 +259,17 @@ public class MainActivity extends AppCompatActivity
 
 
             }
-
-
-
-            // Called when a user swipes left or right on a ViewHolder
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 // Here is where you'll implement swipe to delete
 
-                // COMPLETED (1) Construct the URI for the item to delete
-                //[Hint] Use getTag (from the adapter code) to get the id of the swiped item
-                // Retrieve the id of the task to delete
                 int position = viewHolder.getAdapterPosition();
-
 
                 Doc doc = adapter.getDocAtPosition(position);
 
                 DocService.deleteDoc(MainActivity.this,doc);
                 adapter.deletePosition(position);
-                // Build appropriate uri with String row id appended
-//                String stringId = Integer.toString(id);
-//                Uri uri = TaskContract.TaskEntry.CONTENT_URI;
-//                uri = uri.buildUpon().appendPath(stringId).build();
-//
-//                // COMPLETED (2) Delete a single row of data using a ContentResolver
-//                getContentResolver().delete(uri, null, null);
-//
-//                // COMPLETED (3) Restart the loader to re-query for all tasks after a deletion
-//                getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
             }
         }).attachToRecyclerView(docGridView);
 
@@ -275,17 +283,32 @@ public class MainActivity extends AppCompatActivity
                         startActivity(intent);
                         drawerLayout.closeDrawers();
                         break;
+                    case R.id.nav_sync:
+                        startDocSync();
+                        drawerLayout.closeDrawers();
+                        break;
                     case R.id.nav_logout:
                         FirebaseAuth mAuth = FirebaseAuth.getInstance();
                         mAuth.signOut();
                         Intent theIntent = new Intent(MainActivity.this,LoginActivity.class);
                         startActivity(theIntent);
+                        finish();
                         break;
                 }
                 return false;
             }
         });
 
+
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = hView.findViewById(R.id.nav_account_name);
+        TextView nav_email = hView.findViewById(R.id.nav_account_email);
+        TextView nav_alph = hView.findViewById(R.id.nav_account_name_alphabet);
+
+        String accountName = SharedPreferenceUtils.getPrefUsername(this);
+        nav_user.setText(accountName);
+        nav_email.setText(SharedPreferenceUtils.getPrefEmail(this));
+        nav_alph.setText(accountName.substring(0,1));
 
         docGridView.setAdapter(adapter);
         MobileAds.initialize(this,
@@ -297,20 +320,67 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void startDocSync(){
+        if(TeleUtils.isConnectedToNetwork(MainActivity.this)){
+            DocService.syncDocs(MainActivity.this,
+                    SharedPreferenceUtils.getPrefUserId(MainActivity.this));
+        }else {
+            progressBar.setRefreshing(false);
+//            TODO:startDialog for internet
+            Snackbar.make(drawerLayout,"Internet Connection not available. Check your connection and try again",Snackbar.LENGTH_LONG);
+        }
+
+
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
-//       unregisterReceiver(broadcastReceiver);
+       unregisterReceiver(mSyncDocsReciever);
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
         getSupportLoaderManager().restartLoader(DOC_LOADER_ID,null,this);
-//        broadcastReceiver = new CardServiceBroadcastReceiver();
-//        registerReceiver(broadcastReceiver,intentFilter);
-
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(DocService.ACTION_SYNC_STARTED);
+        intentFilter.addAction(DocService.ACTION_SYNC_END);
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        mSyncDocsReciever = new SyncDocsReciever();
+        registerReceiver(mSyncDocsReciever,intentFilter);
     }
 
+
+    private class SyncDocsReciever extends BroadcastReceiver{
+
+        Snackbar snackbar;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            switch (action){
+                case DocService.ACTION_SYNC_STARTED:
+                    progressBar.setRefreshing(true);
+                    break;
+                case DocService.ACTION_SYNC_END:
+                    progressBar.setRefreshing(false);
+                    break;
+                case ConnectivityManager.CONNECTIVITY_ACTION:
+                    if(TeleUtils.isConnectedToNetwork(MainActivity.this)){
+                        if(snackbar!=null){
+                            snackbar.dismiss();
+                        }
+
+                    }else {
+                        snackbar=Snackbar.make(drawerLayout,"Offline Mode",Snackbar.LENGTH_INDEFINITE);
+                        snackbar.show();
+                    }
+            }
+
+        }
+    }
 }

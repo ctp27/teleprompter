@@ -60,10 +60,15 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/loginStyle"
             android:noHistory="true"/>
         <activity android:name=".SignUpActivity"
-            android:noHistory="true"/>
+            android:parentActivityName=".LoginActivity"
+            android:noHistory="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+        </activity>
         <activity android:name=".LandingPageActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:noHistory="true"

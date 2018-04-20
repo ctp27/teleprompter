@@ -154,6 +154,7 @@ public class Doc implements Parcelable {
             return new Doc[size];
         }
     };
+
     @Exclude
     @Override
     public int describeContents() {

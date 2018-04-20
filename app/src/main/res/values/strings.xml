@@ -76,7 +76,8 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
@@ -88,5 +89,7 @@
     <string name="the_teleprompter">The Teleprompter</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="full_name">Full name</string>
+    <string name="sync_docs">Sync Docs</string>
+    <string name="card_tranisiton">card_transition_name</string>
 
 </resources>

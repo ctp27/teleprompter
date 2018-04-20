@@ -3,6 +3,7 @@ package com.ctp.theteleprompter.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
     }
 
     public interface DocGridAdapterCallbacks{
-        void onDocClicked(Doc clickedDoc);
+        void onDocClicked(Doc clickedDoc, CardView view);
     }
 
 
@@ -130,6 +131,9 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
         @BindView(R.id.doc_text_preview)
         TextView docPreview;
 
+        @BindView(R.id.grid_card_view)
+        CardView cardView;
+
         public DocGridViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
@@ -141,7 +145,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             int position = getAdapterPosition();
             cursor.moveToPosition(position);
             Doc doc = new Doc(cursor);
-            mCallback.onDocClicked(doc);
+            mCallback.onDocClicked(doc,(CardView) view);
         }
     }
 }

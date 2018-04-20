@@ -12,15 +12,17 @@
     android:paddingBottom="16dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
+    android:transitionName="@string/card_tranisiton"
+    android:id="@+id/grid_card_view"
     android:foreground="?android:attr/selectableItemBackground"
     app:background="?android:attr/selectableItemBackground"
-    android:id="@+id/grid_card_view"
     >
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/doc_grid_item_constraintlayout"
+
         >
 
 

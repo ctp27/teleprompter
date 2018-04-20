@@ -10,14 +10,22 @@ import android.support.annotation.Nullable;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DocService extends IntentService {
 
 
     public static final String ACTION_UPDATE = "action-update-doc";
     public static final String ACTION_DELETE = "action-delete-doc";
+    public static final String ACTION_SYNC_STARTED = "com.ctp.theteleprompter.sync.started";
+    public static final String ACTION_SYNC_END = "com.ctp.theteleprompter.sync.ended";
 
 
     private static final String ACTION_INSERT = "action-insert-doc";
@@ -28,6 +36,7 @@ public class DocService extends IntentService {
 
     public static final String TAG = DocService.class.getSimpleName();
     private static final String DATABASE_CHILD_DOCS = "docs";
+    private static final String ACTION_SYNC_DOCS = "action_sync_docs";
 
     public DocService() {
         super(DocService.class.getSimpleName());
@@ -65,6 +74,14 @@ public class DocService extends IntentService {
         context.startService(intent);
     }
 
+    public static void syncDocs(Context context, String userId){
+
+        Intent intent = new Intent(context,DocService.class);
+        intent.putExtra(EXTRA_KEY,userId);
+        intent.setAction(ACTION_SYNC_DOCS);
+        context.startService(intent);
+    }
+
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -84,8 +101,66 @@ public class DocService extends IntentService {
             case ACTION_CHANGE_POSITION:
                 handleActionChangePosition(intent);
                 break;
+            case ACTION_SYNC_DOCS:
+                handleActionSyncDocs(intent);
         }
 
+    }
+
+    private void handleActionSyncDocs(Intent intent) {
+
+        sendSyncBroadcast(true);
+
+        final String userId = intent.getStringExtra(EXTRA_KEY);
+
+        getFirebaseDatabaseReference().child(DATABASE_CHILD_DOCS)
+                .child(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                List<ContentValues> contentValuesList = new ArrayList<>();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+
+
+                    Doc doc = snapshot.getValue(Doc.class);
+                    doc.setUserId(userId);
+
+                    contentValuesList.add(doc.getContentValues());
+                }
+
+
+                ContentValues[] contentValues = contentValuesList.toArray(new ContentValues[1]);
+
+                getContentResolver()
+                        .delete(TeleContract.TeleEntry.TELE_CONTENT_URI,null,null);
+
+                getContentResolver()
+                        .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
+
+                sendSyncBroadcast(false);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                sendSyncBroadcast(false);
+
+
+            }
+        });
+
+
+    }
+
+    private void sendSyncBroadcast(boolean isSyncOn){
+        Intent intent = new Intent();
+        if (isSyncOn) {
+            intent.setAction(ACTION_SYNC_STARTED);
+        }else {
+            intent.setAction(ACTION_SYNC_END);
+        }
+        sendBroadcast(intent);
     }
 
 
@@ -135,12 +210,8 @@ public class DocService extends IntentService {
                 .child(doc.getCloudId())
                 .setValue(doc);
 
-//        getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
-//                TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
 
-
-
-//        TODO: Update on FirebaseDatabase
+//        COMPLETE Update on FirebaseDatabase
 
     }
 

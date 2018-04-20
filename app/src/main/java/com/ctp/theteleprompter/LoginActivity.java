@@ -31,7 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
+import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.utils.TeleUtils;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -76,6 +78,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.sign_up_button)
     Button signUpButton;
 
+    @BindView(R.id.google_sign_in_button)
+    SignInButton googleSignInButton;
+
 
     private FirebaseAuth mAuth;
 
@@ -85,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         // Set up the login form.
         ButterKnife.bind(this);
+        googleSignInButton.setSize(SignInButton.SIZE_WIDE);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
         mAuth = FirebaseAuth.getInstance();
@@ -197,7 +203,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!TeleUtils.isValidEmail(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -252,7 +258,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             String email = user.getEmail();
             SharedPreferenceUtils.setPrefEmail(this,email);
             SharedPreferenceUtils.setPrefUserId(this,userId);
-
+            DocService.syncDocs(this,userId);
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
         }
