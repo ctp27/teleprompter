@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
@@ -20,7 +21,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -31,13 +31,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
+import com.ctp.theteleprompter.fragments.ForgotPasswordDialog;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.utils.TeleUtils;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
@@ -51,7 +58,10 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity
+        implements LoaderCallbacks<Cursor>,
+        View.OnClickListener,
+        ForgotPasswordDialog.ForgotPasswordDialogCallbacks{
 
 
     public static final String TAG = LoginActivity.class.getSimpleName();
@@ -59,6 +69,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private static final int RC_SIGN_IN = 101;
+    private static final String FORGOT_PASSWORD_DIALOG_TAG = "Fogot-password_dialog";
 
 
     /**
@@ -67,10 +79,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    @BindView(R.id.email)
+   AutoCompleteTextView mEmailView;
+
+    @BindView(R.id.password)
+    EditText mPasswordView;
+
+    @BindView(R.id.login_progress)
+    View mProgressView;
+
+    @BindView(R.id.login_form)
+    View mLoginFormView;
 
     @BindView(R.id.login_container)
     LinearLayout loginContainer;
@@ -81,8 +100,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.google_sign_in_button)
     SignInButton googleSignInButton;
 
+    @BindView(R.id.email_sign_in_button)
+    Button mEmailSignInButton;
+
+    @BindView(R.id.forgot_pass_text)
+    TextView forgotPasswordText;
+
 
     private FirebaseAuth mAuth;
+
+    private  GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,11 +117,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         // Set up the login form.
         ButterKnife.bind(this);
+
         googleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
         mAuth = FirebaseAuth.getInstance();
-        mPasswordView = (EditText) findViewById(R.id.password);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestId()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
+
+
+        signUpButton.setOnClickListener(this);
+        mEmailSignInButton.setOnClickListener(this);
+        googleSignInButton.setOnClickListener(this);
+        forgotPasswordText.setOnClickListener(this);
+
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -107,25 +149,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
 
-        signUpButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
+
+
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -135,7 +161,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         getLoaderManager().initLoader(0, null, this);
     }
 
+
     private boolean mayRequestContacts() {
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -155,6 +183,71 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
         }
         return false;
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.sign_up_button:
+                handleSignUpButtonClick();
+                break;
+            case R.id.google_sign_in_button:
+                handleGoogleSignInButtonClick();
+                break;
+            case R.id.email_sign_in_button:
+                attemptLogin();
+                break;
+            case R.id.forgot_pass_text:
+                handleForgotPasswordClick();
+                break;
+        }
+    }
+
+    private void handleGoogleSignInButtonClick() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleSignUpButtonClick() {
+        Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
+        startActivity(intent);
+    }
+
+    private void handleForgotPasswordClick() {
+
+        ForgotPasswordDialog forgotPasswordDialog = new ForgotPasswordDialog();
+        forgotPasswordDialog.show(getSupportFragmentManager(),FORGOT_PASSWORD_DIALOG_TAG);
+    }
+
+
+    @Override
+    public void onSendForgotPassEmailClicked(DialogInterface dialogInterface, String email) {
+
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this,
+                                    getString(R.string.reset_password_dialog_email_sent),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Exception e = task.getException();
+                            if(e instanceof FirebaseAuthInvalidUserException){
+                                Toast.makeText(LoginActivity.this,
+                                        getString(R.string.reset_password_dialog_emailnotfound),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                            else {
+                                Toast.makeText(LoginActivity.this,
+                                        getString(R.string.reset_password_dialog_email_error),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                });
     }
 
     /**
@@ -192,7 +285,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) && TeleUtils.isValidPassword(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -222,6 +315,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Snackbar.make(loginContainer,"Check your internet connection",Snackbar.LENGTH_LONG).show();
             }
 
+
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -245,10 +339,48 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode){
+
+            case RC_SIGN_IN:
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                handleGoogleSignInResult(task);
+                break;
+
+                default:
+                    super.onActivityResult(requestCode, resultCode, data);
+        }
+
+    }
+
+    private void handleGoogleSignInResult(Task<GoogleSignInAccount> task) {
+
+        try {
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+            // Signed in successfully, show authenticated UI.
+            String name = account.getDisplayName();
+            String id = account.getId();
+            String email = account.getEmail();
+            SharedPreferenceUtils.setPrefUsername(this,name);
+            SharedPreferenceUtils.setPrefUserId(this,id);
+            SharedPreferenceUtils.setPrefEmail(this,email);
+
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            updateUI(null);
+        }
+    }
+
     private void updateUI(FirebaseUser user){
         showProgress(false);
         if(user==null){
 //            TODO: show error message
+
         }
         else {
 //            TODO: store his UId in preferences
@@ -256,22 +388,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             String userId = user.getUid();
             String email = user.getEmail();
+            String name = user.getDisplayName();
+
             SharedPreferenceUtils.setPrefEmail(this,email);
             SharedPreferenceUtils.setPrefUserId(this,userId);
+            SharedPreferenceUtils.setPrefUsername(this,name);
+
             DocService.syncDocs(this,userId);
+
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
+
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**

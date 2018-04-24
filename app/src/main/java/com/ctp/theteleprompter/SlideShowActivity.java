@@ -272,7 +272,9 @@ public class SlideShowActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        animationHandler.removeCallbacks(animationRunnable);
+        if(animationHandler!=null) {
+            animationHandler.removeCallbacks(animationRunnable);
+        }
     }
 
     private void toggle() {

@@ -19,8 +19,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".SlideShowActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -51,8 +50,8 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -60,25 +59,37 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/loginStyle"
-            android:noHistory="true"/>
-        <activity android:name=".SignUpActivity"
-            android:parentActivityName=".LoginActivity"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SignUpActivity"
+            android:noHistory="true"
+            android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-        <activity android:name=".LandingPageActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+        <activity
+            android:name=".LandingPageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:noHistory="true"
-            android:configChanges="orientation|keyboardHidden|screenSize">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".TeleAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tele_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

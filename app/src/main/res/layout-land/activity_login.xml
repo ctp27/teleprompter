@@ -9,7 +9,6 @@
     tools:context=".LoginActivity"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:background="@color/colorPrimary"
     android:id="@+id/login_container">
 
     <!-- Login progress -->
@@ -64,7 +63,6 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
-                    app:backgroundTint="@color/colorWhite"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -83,21 +81,38 @@
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
-                    app:backgroundTint="@color/colorWhite"
                     android:maxLines="1"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/email_sign_in_button"
-                android:background="@color/colorPrimaryDark"
-                android:textColor="@color/colorWhite"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="@string/action_sign_in"
-                />
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/email_sign_in_button"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_sign_in"
+                    android:layout_margin="16dp"
+                    />
+
+
+                <TextView
+                    android:id="@+id/forgot_pass_text"
+                    android:gravity="center"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/forgot_pass_string"
+                    />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -114,7 +129,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OR"/>
+                    android:text="@string/label_or"/>
 
                 <View
                     android:layout_width="100dp"

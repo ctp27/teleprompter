@@ -26,10 +26,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="loginStyle" parent="AppTheme.NoActionBar">
-        <item name="colorAccent">@color/colorWhite</item>
-        <item name="android:textColorHint">@color/colorWhite</item>
-    </style>
+
 
 
 

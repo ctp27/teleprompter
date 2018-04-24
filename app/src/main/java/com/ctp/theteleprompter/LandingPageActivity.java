@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -39,13 +41,23 @@ public class LandingPageActivity extends AppCompatActivity {
     private void initialize(FirebaseUser user){
 
         if(user == null){
-            new SendToSignUpTask().execute();
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+            if(account!=null){
+                redirectToMainActivity();
+            }
+            else {
+                new SendToSignUpTask().execute();
+            }
         }else {
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
+           redirectToMainActivity();
         }
 
 
+   }
+
+   private void redirectToMainActivity(){
+       Intent intent = new Intent(this,MainActivity.class);
+       startActivity(intent);
    }
 
 

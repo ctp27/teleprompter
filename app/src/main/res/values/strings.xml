@@ -36,14 +36,12 @@
     <string name="pref_last_cloudId_key" translatable="false">pref_last_cloudid_key_string</string>
 
 
-
     <string name="action_logout">Logout</string>
 
     <string name="pref_fontsize_label_small">Small</string>
     <string name="pref_fontsize_label_medium">Medium</string>
     <string name="pref_fontsize_label_large">Large</string>
     <string name="pref_fontsize_label_xlarge">Extra Large</string>
-
 
 
     <string name="pref_speed_label_1">1</string>
@@ -63,7 +61,6 @@
     <string name="pref_speed_value_3">2</string>
     <string name="pref_speed_value_4">3</string>
     <string name="pref_speed_value_5">4</string>
-
 
 
     <string name="pref_fontsize_title">Default Font Size</string>
@@ -91,5 +88,26 @@
     <string name="full_name">Full name</string>
     <string name="sync_docs">Sync Docs</string>
     <string name="card_tranisiton">card_transition_name</string>
+    <string name="label_or">OR</string>
+
+    <string name="error_password_nomatch">The passwords do not match</string>
+    <string name="error_long_name">Full name should be less than 60 characters</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="forgot_pass_string">Forgot Password ?</string>
+
+    <string name="send_email">Send Email</string>
+    <string name="reset_password_dialog_message">A password reset link will be sent to your registered email Id.
+        Follow the instructions in the link to reset your password.
+    </string>
+
+    <!--Forgot email dialog -->
+    <string name="reset_password_dialog_emailnotfound">No registered account found with this email. Please sign up or try another email
+    </string>
+    <string name="reset_password_dialog_email_error">An unexpected error occured while sending the email.
+        Please try again
+    </string>
+
+    <string name="reset_password_dialog_email_sent">Email Sent</string>
 
 </resources>
