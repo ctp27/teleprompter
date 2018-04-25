@@ -1,13 +1,11 @@
 package com.ctp.theteleprompter;
 
-import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -171,15 +169,7 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, DocEditActivity.class);
         intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY, doc);
 
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
-            Bundle bundle = ActivityOptions.
-                    makeSceneTransitionAnimation(this).toBundle();
-            startActivity(intent,bundle);
-        }
-        else {
-
-            startActivity(intent);
-        }
+        startActivity(intent);
 
     }
 
@@ -292,6 +282,7 @@ public class MainActivity extends AppCompatActivity
                         mAuth.signOut();
                         Intent theIntent = new Intent(MainActivity.this,LoginActivity.class);
                         startActivity(theIntent);
+                        SharedPreferenceUtils.invalidateUserDetails(MainActivity.this);
                         finish();
                         break;
                 }

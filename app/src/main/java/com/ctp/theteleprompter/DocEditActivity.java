@@ -3,6 +3,7 @@ package com.ctp.theteleprompter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ctp.theteleprompter.fragments.DocEditActivityFragment;
@@ -43,34 +44,30 @@ public class DocEditActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.doc_edit_menu,menu);
+        return true
     }
 
     @Override
-    public void onBackPressed() {
-//        DocEditActivityFragment fragment = (DocEditActivityFragment)
-//                getSupportFragmentManager().findFragmentByTag(DOC_EDIT_FRAGMENT_TAG);
-//
-//        Doc doc = fragment.getDataFromFragment();
-//        if(doc!=null) {
-//            Log.d(DOC_EDIT_FRAGMENT_TAG,"Updated");
-//            if (doc.isNew()) {
-//                DocService.insertDoc(this, doc);
-//            }
-//            else {
-//                DocService.updateDoc(this,doc);
-//            }
-//
-//        }
-//
-        super.onBackPressed();
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        DocEditActivityFragment fragment = (DocEditActivityFragment)
+                getSupportFragmentManager().findFragmentByTag(DOC_EDIT_FRAGMENT_TAG);
+
+        switch (id){
+            case R.id.action_delete:
+                break;
+
+            case R.id.action_share:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
+
 
 
     @Override

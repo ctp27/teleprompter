@@ -92,6 +92,7 @@ public class DocEditActivityFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         userId = SharedPreferenceUtils.getPrefUserId(getContext());
         speedNumber = SharedPreferenceUtils.getDefaultScrollSpeed(getContext());
         fontSize = SharedPreferenceUtils.getDefaultFontSize(getContext());

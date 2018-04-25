@@ -129,4 +129,31 @@ public class SharedPreferenceUtils {
         return sp.getBoolean(mirrorKey,defaultBoolean);
     }
 
+    public static int getPinnedId(Context context){
+        int defaultValue = -1;
+        String key = context.getString(R.string.pref_pinned_doc_key);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getInt(key,defaultValue);
+    }
+
+    public static void setPinnedId(Context context, int id){
+        String key = context.getString(R.string.pref_pinned_doc_key);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(key, id);
+        editor.apply();
+    }
+
+    public static void invalidateUserDetails(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(context.getString(R.string.pref_pinned_doc_key));
+        editor.remove(context.getString(R.string.pref_last_cloudId_key));
+        editor.remove(context.getString(R.string.pref_uid_key));
+        editor.remove(context.getString(R.string.pref_user_name_key));
+        editor.remove(context.getString(R.string.pref_email_key));
+        editor.remove(context.getString(R.string.pref_last_id_key));
+        editor.apply();
+    }
+
 }

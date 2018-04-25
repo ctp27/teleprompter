@@ -37,7 +37,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/doc_text_preview"
-            app:layout_constraintEnd_toEndOf="@id/doc_grid_item_constraintlayout"
+            app:layout_constraintEnd_toStartOf="@+id/doc_pin_button"
             app:layout_constraintStart_toStartOf="@id/doc_grid_item_constraintlayout"
             app:layout_constraintTop_toTopOf="@id/doc_grid_item_constraintlayout"
             tools:text="TextView" />
@@ -48,14 +48,27 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/doc_title"
-            app:layout_constraintStart_toStartOf="@+id/doc_title"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:ellipsize="end"
             android:maxLines="10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/doc_title"
             tools:text="TextView" />
 
-
+        <ImageView
+            android:id="@+id/doc_pin_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:padding="0dp"
+            android:src="@drawable/ic_office_push_pin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

@@ -9,5 +9,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="greyBackground">#EEEEEE</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorPinSelected">#03A9F4</color>
     <color name="colorDarkNotification">#9E9E9E</color>
 </resources>
