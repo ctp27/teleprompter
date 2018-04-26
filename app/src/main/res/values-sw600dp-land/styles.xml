@@ -10,7 +10,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/greyBackground</item>
@@ -20,10 +20,16 @@
         <item name="android:windowBackground">@color/greyBackground</item>
     </style>
 
-    <style name="editDocTheme" parent="AppTheme.NoActionBar">
+    <style name="editDocTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/greyBackground</item>
         <item name="colorPrimary">@color/colorWhite</item>
         <item name="colorPrimaryDark">@color/colorDarkNotification</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+
     </style>
 
 

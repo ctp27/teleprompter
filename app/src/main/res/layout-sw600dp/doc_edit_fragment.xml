@@ -14,7 +14,8 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline_editor_controls"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
         <ScrollView
             android:layout_width="match_parent"
@@ -22,7 +23,8 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+               >
 
 
                 <EditText
@@ -50,6 +52,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+
                     android:background="@android:color/transparent"
                     android:gravity="top"
                     android:hint="@string/detail_text_hint"

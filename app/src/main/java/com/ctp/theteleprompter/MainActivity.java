@@ -21,7 +21,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -76,9 +75,6 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawerLayout;
 
     private SyncDocsReciever mSyncDocsReciever;
-
-    private IntentFilter intentFilter;
-
 
 
 
@@ -165,12 +161,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDocClicked(Doc doc, CardView view) {
+    public void onDocClicked(Doc doc) {
         Intent intent = new Intent(this, DocEditActivity.class);
         intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY, doc);
-
         startActivity(intent);
-
     }
 
     private void initializeWidgets(){
@@ -320,8 +314,6 @@ public class MainActivity extends AppCompatActivity
 //            TODO:startDialog for internet
             Snackbar.make(drawerLayout,"Internet Connection not available. Check your connection and try again",Snackbar.LENGTH_LONG);
         }
-
-
     }
 
     @Override
@@ -336,7 +328,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         getSupportLoaderManager().restartLoader(DOC_LOADER_ID,null,this);
-        intentFilter = new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(DocService.ACTION_SYNC_STARTED);
         intentFilter.addAction(DocService.ACTION_SYNC_END);
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);

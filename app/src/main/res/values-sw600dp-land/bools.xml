@@ -3,5 +3,5 @@
 
     <bool name="pref_mirror_text_default">false</bool>
     <bool name="isTabletPort">false</bool>
-    <bool name="isTabletLand">false</bool>
+    <bool name="isTabletLand">true</bool>
 </resources>

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.app.SharedElementCallback;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,9 @@ import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.model.TeleSpec;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.ui.ColorView;
+
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -155,19 +160,31 @@ public class DocEditActivityFragment extends Fragment
         scrollSpeedBar.setOnSeekBarChangeListener(this);
         fontSizeBar.setOnSeekBarChangeListener(this);
 
-
-
         titleText.setText(thisDoc.getTitle());
         textBody.setText(thisDoc.getText());
-        textBody.requestFocus();
+
+
 
         if(savedInstanceState==null){
-            textBody.setSelection(thisDoc.getText().length());
+
+            if(thisDoc.isNew()){
+                titleText.requestFocus();
+            }else {
+                textBody.requestFocus();
+                textBody.setSelection(thisDoc.getText().length());
+            }
         }
 
 
         setScrollSpeed();
         setFontSize();
+
+       setEnterSharedElementCallback(new SharedElementCallback() {
+           @Override
+           public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+               super.onMapSharedElements(names, sharedElements);
+           }
+       });
 
 
         return v;
@@ -399,6 +416,36 @@ public class DocEditActivityFragment extends Fragment
         titleStore = title;
 
 
+    }
+
+    public void deleteDoc(){
+
+        if(thisDoc.isNew()){
+            if(orientationChanged){
+                thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
+                thisDoc.setCloudId(SharedPreferenceUtils.getLastStoredCloudId(getContext()));
+                DocService.deleteDoc(getContext(),thisDoc);
+            }
+
+
+        }else {
+            DocService.deleteDoc(getContext(),thisDoc);
+        }
+
+        getActivity().finish();
+    }
+
+
+    public void shareDoc(){
+
+        String mimeType = "text/plain";
+        String title = thisDoc.getTitle();
+        String content = thisDoc.getTitle()+"\n\n"+thisDoc.getText();
+        ShareCompat.IntentBuilder
+                .from(getActivity()).setType(mimeType)
+                .setChooserTitle(title)
+                .setText(content)
+                .startChooser();
     }
 
 

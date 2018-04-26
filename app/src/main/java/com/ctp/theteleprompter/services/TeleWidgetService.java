@@ -68,7 +68,7 @@ public class TeleWidgetService extends JobIntentService {
                         getContentResolver()
                                 .query(uri,null,null,null,null);
 
-                if(cursor!=null) {
+                if(cursor!=null && cursor.getCount()>0) {
 
                     /*  Move to first */
                     cursor.moveToFirst();

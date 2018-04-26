@@ -140,6 +140,8 @@ public class DocService extends IntentService {
                         .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
 
                 sendSyncBroadcast(false);
+
+                TeleWidgetService.updateTeleWidgets(DocService.this);
             }
 
             @Override

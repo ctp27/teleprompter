@@ -41,7 +41,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
     }
 
     public interface DocGridAdapterCallbacks{
-        void onDocClicked(Doc clickedDoc, CardView view);
+        void onDocClicked(Doc clickedDoc);
     }
 
 
@@ -173,7 +173,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             switch (view.getId()){
                 case R.id.grid_card_view:
 
-                    mCallback.onDocClicked(doc,(CardView) view);
+                    mCallback.onDocClicked(doc);
 
                     break;
 
