@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
-import com.ctp.theteleprompter.fragments.ForgotPasswordDialog;
+import com.ctp.theteleprompter.fragments.ForgotPasswordDialogFragment;
+import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -42,16 +44,19 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -60,8 +65,8 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity
         implements LoaderCallbacks<Cursor>,
-        View.OnClickListener,
-        ForgotPasswordDialog.ForgotPasswordDialogCallbacks{
+        RequestInternetDialogFragment.RequestInternetDialogFragmentCallbacks,
+        ForgotPasswordDialogFragment.ForgotPasswordDialogCallbacks{
 
 
     public static final String TAG = LoginActivity.class.getSimpleName();
@@ -71,6 +76,7 @@ public class LoginActivity extends AppCompatActivity
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final int RC_SIGN_IN = 101;
     private static final String FORGOT_PASSWORD_DIALOG_TAG = "Fogot-password_dialog";
+    private static final String REQUEST_INTERNET_DIALOG_TAG = "request_internet_dialog";
 
 
     /**
@@ -107,6 +113,7 @@ public class LoginActivity extends AppCompatActivity
     TextView forgotPasswordText;
 
 
+
     private FirebaseAuth mAuth;
 
     private  GoogleSignInClient mGoogleSignInClient;
@@ -118,24 +125,24 @@ public class LoginActivity extends AppCompatActivity
         // Set up the login form.
         ButterKnife.bind(this);
 
+        /*  Set the google sign in button size  */
         googleSignInButton.setSize(SignInButton.SIZE_WIDE);
+
+        /*  Populate the autocomplete   */
         populateAutoComplete();
 
+        /*  Get Firebase Auth instance  */
         mAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
                 .requestId()
+                .requestIdToken(getString(R.string.webclient_server_id))
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
 
-
-        signUpButton.setOnClickListener(this);
-        mEmailSignInButton.setOnClickListener(this);
-        googleSignInButton.setOnClickListener(this);
-        forgotPasswordText.setOnClickListener(this);
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -186,61 +193,88 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.sign_up_button:
-                handleSignUpButtonClick();
-                break;
-            case R.id.google_sign_in_button:
-                handleGoogleSignInButtonClick();
-                break;
-            case R.id.email_sign_in_button:
-                attemptLogin();
-                break;
-            case R.id.forgot_pass_text:
-                handleForgotPasswordClick();
-                break;
+
+    /**
+     * Handles the google signin click event
+     */
+    @OnClick(R.id.google_sign_in_button)
+    protected void handleGoogleSignInButtonClick() {
+        if(TeleUtils.isConnectedToNetwork(this)) {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }else {
+            showRequestInternetDialog();
         }
     }
 
-    private void handleGoogleSignInButtonClick() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    private void handleSignUpButtonClick() {
+    /**
+     * Handles Sign up button click event
+     */
+    @OnClick(R.id.sign_up_button)
+    protected void handleSignUpButtonClick() {
+        /*  Create and start the Sign Up activity   */
         Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
         startActivity(intent);
     }
 
-    private void handleForgotPasswordClick() {
+    /**
+     * Handles forgot password button Click event
+     */
+    @OnClick(R.id.forgot_pass_text)
+    protected void handleForgotPasswordClick() {
+        /*  Display the forgot password dialog  */
 
-        ForgotPasswordDialog forgotPasswordDialog = new ForgotPasswordDialog();
+        if(!TeleUtils.isConnectedToNetwork(this)){
+            showRequestInternetDialog();
+            return;
+        }
+
+        ForgotPasswordDialogFragment forgotPasswordDialog = new ForgotPasswordDialogFragment();
         forgotPasswordDialog.show(getSupportFragmentManager(),FORGOT_PASSWORD_DIALOG_TAG);
     }
 
 
+
+    /**
+     * Handles the event when the the user enters the email in the forgot password dialog and hits
+     * send email.
+     * @param dialogInterface The dialog interface object of the forgot password dialog
+     * @param email The valid email entered by the user
+     */
     @Override
     public void onSendForgotPassEmailClicked(DialogInterface dialogInterface, String email) {
 
+
+
+        /*  Send the password reset email by passing the email */
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        /* Task is complete */
+
                         if (task.isSuccessful()) {
+
+                            /*  Email sending successful! Yay notify the user! */
+
                             Toast.makeText(LoginActivity.this,
                                     getString(R.string.reset_password_dialog_email_sent),
                                     Toast.LENGTH_LONG).show();
                         }
                         else {
+                            /*  Email not sent due to some error. Get the exception    */
                             Exception e = task.getException();
+
                             if(e instanceof FirebaseAuthInvalidUserException){
+
+                                /*  This email was never registered.
+                                Notify the user to check the email  */
                                 Toast.makeText(LoginActivity.this,
                                         getString(R.string.reset_password_dialog_emailnotfound),
                                         Toast.LENGTH_LONG).show();
                             }
                             else {
+                                /*  Notify the user that an error occured   */
                                 Toast.makeText(LoginActivity.this,
                                         getString(R.string.reset_password_dialog_email_error),
                                         Toast.LENGTH_LONG).show();
@@ -270,12 +304,18 @@ public class LoginActivity extends AppCompatActivity
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    @OnClick(R.id.email_sign_in_button)
+    protected void attemptLogin() {
 
 
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+
+        if(!TeleUtils.isConnectedToNetwork(this)){
+            showRequestInternetDialog();
+            return;
+        }
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
@@ -311,26 +351,23 @@ public class LoginActivity extends AppCompatActivity
             // perform the user login attempt.
             showProgress(true);
 
-            if(!TeleUtils.isConnectedToNetwork(this)){
-                Snackbar.make(loginContainer,"Check your internet connection",Snackbar.LENGTH_LONG).show();
-            }
 
-
+            /*  Authenticate using google authentication. Pass email and password   */
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "signInWithEmail:success");
+//                                Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
+                                updateUI(user,null);
                             } else {
                                 // If sign in fails, display a message to the user.
-                                Log.w(TAG, "signInWithEmail:failure", task.getException());
+//                                Log.w(TAG, "signInWithEmail:failure", task.getException());
                                 Toast.makeText(LoginActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
-                                updateUI(null);
+                                updateUI(null, "Authentication failed");
                             }
 
                             // ...
@@ -339,15 +376,24 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-
+    /**
+     * Called after an activity sends back a result
+     * @param requestCode The request code while starting the activity
+     * @param resultCode   The result code of the activity
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         switch (requestCode){
 
             case RC_SIGN_IN:
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                handleGoogleSignInResult(task);
+                /*  Check the result for Google Sign in Activity request    */
+                if(resultCode == RESULT_OK) {
+                    /*  If result is o.k, start google sign in authentication*/
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    handleGoogleSignInResult(task);
+                }
                 break;
 
                 default:
@@ -356,31 +402,74 @@ public class LoginActivity extends AppCompatActivity
 
     }
 
+
+    /**
+     * Handles the google sign in result. Extracts the credentials from the google sign in
+     * and authenticates the user.
+     * @param task
+     */
     private void handleGoogleSignInResult(Task<GoogleSignInAccount> task) {
 
+        /*  Show Progress bar   */
+        showProgress(true);
+
         try {
+            /*  Extract the Google Sign in Account  */
             GoogleSignInAccount account = task.getResult(ApiException.class);
+
             // Signed in successfully, show authenticated UI.
-            String name = account.getDisplayName();
-            String id = account.getId();
-            String email = account.getEmail();
-            SharedPreferenceUtils.setPrefUsername(this,name);
-            SharedPreferenceUtils.setPrefUserId(this,id);
-            SharedPreferenceUtils.setPrefEmail(this,email);
+            Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
+
+            /*  Get the auth credential using the ID token  */
+            AuthCredential credential = GoogleAuthProvider
+                    .getCredential(account.getIdToken(), null);
+
+            /*  Authenticate the user to the application with the credential obtained */
+            mAuth.signInWithCredential(credential)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithCredential:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                updateUI(user,null);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithCredential:failure", task.getException());
+//                                Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                                updateUI(null, "Google Sign Authentication failed. Please try again");
+                            }
+
+                            // ...
+                        }
+                    });
+
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
+
+            updateUI(null,"Google Sign in failed. Please check your google account and try again");
         }
     }
 
-    private void updateUI(FirebaseUser user){
+
+    /**
+     * Updates the UI based on the login attempt results. Proceeds to login activity if user
+     * is successfully logged in or shows an error if the user is not (ie. User is null)
+     * @param user The FirebaseUser object which contains the details of the logged in user.
+     *             Null if not authenticated.
+     */
+    private void updateUI(FirebaseUser user, String message){
         showProgress(false);
+
         if(user==null){
 //            TODO: show error message
-
+            if(message!=null) {
+                Snackbar.make(loginContainer, message, Snackbar.LENGTH_LONG).show();
+            }
         }
         else {
 //            TODO: store his UId in preferences
@@ -398,8 +487,35 @@ public class LoginActivity extends AppCompatActivity
 
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
+            finish();
 
         }
+    }
+
+    private void showRequestInternetDialog(){
+        RequestInternetDialogFragment dialogFragment = new RequestInternetDialogFragment();
+        dialogFragment.show(getSupportFragmentManager(),REQUEST_INTERNET_DIALOG_TAG);
+    }
+
+    /**
+     * Called if user accepts to turn on the internet from the
+     * request internet dialog.
+     * @param dialogInterface The dialog interface of the RequestInternetDialog
+     */
+    @Override
+    public void onUserAcceptsInternetRequest(DialogInterface dialogInterface) {
+        /*  Open Wifi settings  */
+        startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 0);
+    }
+
+    /**
+     * Called if user denies to turn on the internet from the
+     * request internet dialog.
+     * @param dialogInterface The dialog interface of the RequestInternetDialog
+     */
+    @Override
+    public void onUserDeniesInternetRequest(DialogInterface dialogInterface) {
+        /*  Do nothing for now  */
     }
 
     /**
@@ -412,6 +528,7 @@ public class LoginActivity extends AppCompatActivity
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginFormView.animate().setDuration(shortAnimTime).alpha(
@@ -437,6 +554,9 @@ public class LoginActivity extends AppCompatActivity
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
+
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

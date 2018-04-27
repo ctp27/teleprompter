@@ -173,6 +173,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             switch (view.getId()){
                 case R.id.grid_card_view:
 
+                    /*  Pass the clicked doc to the callbacks   */
                     mCallback.onDocClicked(doc);
 
                     break;
@@ -190,6 +191,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
 
                     /* Update the widget of the new Pinned doc */
                     TeleWidgetService.updateTeleWidgets(view.getContext());
+
                     break;
 
             }

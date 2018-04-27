@@ -12,19 +12,14 @@
     android:id="@+id/login_container">
 
     <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
+
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:background="@color/colorPrimary"
         android:padding="16dp"
+        android:id="@+id/app_banner_view"
         >
 
         <TextView
@@ -90,6 +85,15 @@
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
+
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center"
+                android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"

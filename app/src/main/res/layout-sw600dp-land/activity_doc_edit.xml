@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:navigationIcon="@drawable/ic_navigation_icon_grey_24dp"/>
+            app:navigationIcon="@drawable/ic_close_black_24dp"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -28,6 +28,7 @@
             android:id="@+id/doc_edit_fragment_container"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             />
+
 
 
 </android.support.design.widget.CoordinatorLayout>

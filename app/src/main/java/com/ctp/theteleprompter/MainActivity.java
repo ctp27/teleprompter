@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -27,7 +26,6 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
     private SyncDocsReciever mSyncDocsReciever;
 
-
+    private boolean docsMoved;
 
     private DocGridAdapter adapter;
 
@@ -93,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-
+        docsMoved = false;
         initializeWidgets();
 
 
@@ -129,11 +127,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main,menu);
-        return true;
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -141,10 +135,6 @@ public class MainActivity extends AppCompatActivity
             case android.R.id.home:
                drawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.action_settings:
-                Intent intent = new Intent(this,LoginActivity.class);
-                startActivity(intent);
-                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -221,28 +211,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y) {
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        List<Doc> orderedDocs = adapter.getDocList();
-
-                        for(int i=0;i<orderedDocs.size();i++){
-
-                            Doc d = orderedDocs.get(i);
-                            Log.d(TAG,"Set Priority of "+d.getTitle()+" from "+d.getPriority() +" to "+(orderedDocs.size()-i));
-                            int newPriority = orderedDocs.size()-i;
-                            d.setPriority(newPriority);
-
-                            DocService.moveDocs(MainActivity.this,d);
-
-                        }
-
-                    }
-                },1000);
+                docsMoved = true;
 
 
             }
+
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 // Here is where you'll implement swipe to delete
@@ -314,6 +287,7 @@ public class MainActivity extends AppCompatActivity
 //            TODO:startDialog for internet
             Snackbar.make(drawerLayout,"Internet Connection not available. Check your connection and try again",Snackbar.LENGTH_LONG);
         }
+
     }
 
     @Override
@@ -363,6 +337,39 @@ public class MainActivity extends AppCompatActivity
                         snackbar.show();
                     }
             }
+
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(docsMoved){
+            updateDocPositions();
+        }
+    }
+
+
+
+
+    private void updateDocPositions(){
+        List<Doc> orderedDocs = adapter.getDocList();
+
+        for(int i=0;i<orderedDocs.size();i++){
+
+            Doc d = orderedDocs.get(i);
+            Log.d(TAG,"Set Priority of "+d.getTitle()+" from "+d.getPriority() +" to "+(orderedDocs.size()-i));
+            int newPriority = orderedDocs.size()-i;
+            d.setPriority(newPriority);
+
+            DocService.moveDocs(MainActivity.this,d);
 
         }
     }

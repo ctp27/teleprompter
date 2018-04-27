@@ -1,9 +1,9 @@
 package com.ctp.theteleprompter;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
+import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,11 +28,13 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SignUpActivity extends AppCompatActivity
-                implements View.OnClickListener{
+                implements RequestInternetDialogFragment.RequestInternetDialogFragmentCallbacks{
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
+    private static final String REQUEST_INTERNET_DIALOG_TAG = "request_internet_dialog";
 
     @BindView(R.id.email)
     EditText emailInput;
@@ -62,24 +65,12 @@ public class SignUpActivity extends AppCompatActivity
         setContentView(R.layout.activity_sign_up);
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
-        signUpButton.setOnClickListener(this);
 
     }
 
 
 
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-
-        switch (id){
-            case R.id.sign_up_button:
-                initiateSignUp();
-                break;
-        }
-    }
-
-
+    @OnClick(R.id.sign_up_button)
     private void initiateSignUp(){
         signUpButton.setEnabled(false);
         String name = fullNameInput.getText().toString();
@@ -87,13 +78,6 @@ public class SignUpActivity extends AppCompatActivity
         String password = passwordInput.getText().toString();
         String confirmPassword = confirmPasswordInput.getText().toString();
 
-        if(!TeleUtils.isConnectedToNetwork(this)){
-            Snackbar.make(layoutContainer,
-                    "Check your internet connection"
-                    ,Snackbar.LENGTH_LONG).show();
-
-            return;
-        }
 
         boolean cancel = false;
         View focusView = null;
@@ -154,8 +138,8 @@ public class SignUpActivity extends AppCompatActivity
             // perform the user login attempt.
 
             if (!TeleUtils.isConnectedToNetwork(this)) {
-//                TODO: launch a dialog
-                Snackbar.make(layoutContainer, "Check your internet connection", Snackbar.LENGTH_LONG).show();
+                RequestInternetDialogFragment dialogFragment = new RequestInternetDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(),REQUEST_INTERNET_DIALOG_TAG);
             }
             else {
 
@@ -242,6 +226,17 @@ public class SignUpActivity extends AppCompatActivity
         }
 
 
+
+    }
+
+
+    @Override
+    public void onUserAcceptsInternetRequest(DialogInterface dialogInterface) {
+
+    }
+
+    @Override
+    public void onUserDeniesInternetRequest(DialogInterface dialogInterface) {
 
     }
 

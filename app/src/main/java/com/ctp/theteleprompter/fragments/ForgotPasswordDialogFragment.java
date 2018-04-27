@@ -18,7 +18,7 @@ import com.ctp.theteleprompter.utils.TeleUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ForgotPasswordDialog extends DialogFragment {
+public class ForgotPasswordDialogFragment extends DialogFragment {
 
 
     private ForgotPasswordDialogCallbacks mCallback;
