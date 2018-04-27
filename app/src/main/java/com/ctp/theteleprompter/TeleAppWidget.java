@@ -100,6 +100,7 @@ public class TeleAppWidget extends AppWidgetProvider {
     private static PendingIntent getMainActivityPendingIntent(Context context){
 
         Intent intent = new Intent(context,MainActivity.class);
+        intent.putExtra(MainActivity.INTENT_EXTRA_NO_PINNED_DOC,true);
 
         return PendingIntent
                 .getActivity(context,

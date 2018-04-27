@@ -18,7 +18,8 @@ import com.ctp.theteleprompter.utils.TeleUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ForgotPasswordDialogFragment extends DialogFragment {
+public class ForgotPasswordDialogFragment extends DialogFragment
+            {
 
 
     private ForgotPasswordDialogCallbacks mCallback;
@@ -61,6 +62,11 @@ public class ForgotPasswordDialogFragment extends DialogFragment {
                         String email = forgottenEmail.getText().toString();
 
                         if(TeleUtils.isValidEmail(email)){
+                            if(!TeleUtils.isConnectedToNetwork(getContext())){
+                               forgottenEmail.setError(getString(R.string.request_internet_dialog_title));
+                               forgottenEmail.requestFocus();
+                                return;
+                            }
                             mCallback.onSendForgotPassEmailClicked(dialog,email);
                             dialog.dismiss();
                         }

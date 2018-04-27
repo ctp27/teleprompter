@@ -20,6 +20,9 @@
     <string name="countdown_start">3</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!--Important Firebase connectivity ids-->
+    <string name="webclient_server_id" translatable="false">644889287337-hoiqaclr3otr975103s7mc2sc1n51vha.apps.googleusercontent.com</string>
+
     <!-- Strings related to Settings -->
 
 
@@ -115,12 +118,23 @@
     <string name="action_share">Share</string>
     <string name="card_transition_2">card_transition_2</string>
 
-    <string name="webclient_server_id" translatable="false">644889287337-hoiqaclr3otr975103s7mc2sc1n51vha.apps.googleusercontent.com</string>
+
 
     <!--Request internet dialog-->
     <string name="request_internet_dialog_title">Internet Connection Required</string>
     <string name="request_internet_dialog_text">An active internet connection is required to proceed. Would you like to turn on the internet? </string>
     <string name="request_internet_dialog_positive">Yes</string>
     <string name="request_internet_dialog_negative">No</string>
+
+    <!--Sign up activity snackbar messages  -->
+    <string name="account_exists_message">Account already exists! Please sign in</string>
+    <string name="authentication_failed">An unexpected error occurred. Please try again</string>
+
+    <!--Main Activity snackbar messages-->
+    <string name="main_no_pinned_docs_msg">No Docs have been pinned. Please pin a Doc!</string>
+
+    <!--Login Activity Snackbars-->
+    <string name="login_incorrect_password">Password is incorrect. Please try again</string>
+    <string name="login_account_not_exists">No account exists with this email</string>
 
 </resources>

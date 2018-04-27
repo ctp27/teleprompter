@@ -170,21 +170,30 @@ public class DocService extends IntentService {
 
         Doc doc = intent.getParcelableExtra(EXTRA_KEY);
 
-        Uri uri = doc.getUri();
+        if(doc!=null) {
+            /*  the doc is not null  */
+            /*  Get the Uri for this doc    */
+            Uri uri = doc.getUri();
 
-        getContentResolver().delete(uri,null,null);
+            /*  Delete the Uri from local database  */
+            getContentResolver().delete(uri, null, null);
 
-        doc.setUserId(SharedPreferenceUtils.getPrefUserId(this));
-
-
-        /*  Delete from Firebase Database   */
-        getFirebaseDatabaseReference()
-                .child(DATABASE_CHILD_DOCS)
-                .child(doc.getUserId())
-                .child(doc.getCloudId())
-                .removeValue();
+            /*  Set the user id into the doc to delete online   */
+            doc.setUserId(SharedPreferenceUtils.getPrefUserId(this));
 
 
+            /*  Delete from Firebase Database   */
+            getFirebaseDatabaseReference()
+                    .child(DATABASE_CHILD_DOCS)
+                    .child(doc.getUserId())
+                    .child(doc.getCloudId())
+                    .removeValue();
+
+        }else {
+            getContentResolver()
+                    .delete(TeleContract.TeleEntry.TELE_CONTENT_URI,
+                            null,null);
+        }
     }
 
 

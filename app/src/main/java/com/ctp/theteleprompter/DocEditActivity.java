@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
 
 import com.ctp.theteleprompter.fragments.DocEditActivityFragment;
 import com.ctp.theteleprompter.model.Doc;
@@ -66,14 +65,6 @@ public class DocEditActivity extends AppCompatActivity {
     }
 
 
-    private void setActivityDimensions(int height, int width, int x, int y){
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.x = x;
-        params.width = width;
-        params.y = y;
-
-        this.getWindow().setAttributes(params);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

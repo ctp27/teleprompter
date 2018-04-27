@@ -17,7 +17,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +27,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ctp.theteleprompter.adapters.DocGridAdapter;
@@ -35,10 +35,13 @@ import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.services.DocService;
+import com.ctp.theteleprompter.services.TeleWidgetService;
 import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
@@ -46,6 +49,7 @@ import java.util.List;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity
             implements DocGridAdapter.DocGridAdapterCallbacks,
@@ -53,12 +57,14 @@ public class MainActivity extends AppCompatActivity
 
     private static final int DOC_LOADER_ID = 10001;
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String INTENT_EXTRA_NO_PINNED_DOC="no-pinned-doc";
 
     @BindView(R.id.main_doc_recycler_view)
     RecyclerView docGridView;
 
-    @BindView(R.id.main_refresh_layout)
-    SwipeRefreshLayout progressBar;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
 
     @BindView(R.id.ad_view)
     AdView mAdView;
@@ -72,6 +78,9 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
+    @BindView(R.id.fab)
+    FloatingActionButton floatingActionButton;
+
     private SyncDocsReciever mSyncDocsReciever;
 
     private boolean docsMoved;
@@ -79,7 +88,6 @@ public class MainActivity extends AppCompatActivity
     private DocGridAdapter adapter;
 
 //    private IntentFilter intentFilter;
-//    private CardServiceBroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +102,33 @@ public class MainActivity extends AppCompatActivity
         docsMoved = false;
         initializeWidgets();
 
+        if(savedInstanceState==null && getIntent().hasExtra(INTENT_EXTRA_NO_PINNED_DOC)){
+            if(getIntent().getBooleanExtra(INTENT_EXTRA_NO_PINNED_DOC,false)){
+                /*  If coming from the widget and no docs pinned    */
+                Snackbar.make(findViewById(R.id.constraintLayout),
+                        getString(R.string.main_no_pinned_docs_msg),
+                        Snackbar.LENGTH_LONG).show();
+            }
+        }
 
 
+
+    }
+
+    /**
+     * Handles the clicks on the floating add action button. Opens the
+     * Edit doc activity for a new doc.
+     */
+    @OnClick({R.id.fab})
+    protected void onFabButtonClicked(){
+        Intent intent = new Intent(MainActivity.this,DocEditActivity.class);
+        Doc doc = new Doc();
+        doc.setTitle("");
+        doc.setText("");
+        doc.setNew(true);
+        doc.setUserId(SharedPreferenceUtils.getPrefUserId(MainActivity.this));
+        intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY,doc);
+        startActivity(intent);
     }
 
 
@@ -103,7 +136,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         if(id==DOC_LOADER_ID){
-            progressBar.setRefreshing(true);
             return new CursorLoader(this, TeleContract.TeleEntry.TELE_CONTENT_URI,null,null,null,
                     TeleContract.TeleEntry.COLUMN_PRIORITY+" DESC");
         }
@@ -112,11 +144,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        progressBar.setRefreshing(false);
         if(data==null){
+            showProgressBar(false);
             return;
         }
 
+        showProgressBar(false);
         adapter.swapCursor(data);
         Log.d(TAG,"Calles Swap cursor");
     }
@@ -139,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -159,26 +193,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initializeWidgets(){
 
-        /*  Initialize floating add butto   */
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        /*  Start new DocEdit Activity Intent or fragment */
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               Intent intent = new Intent(MainActivity.this,DocEditActivity.class);
-               Doc doc = new Doc();
-               doc.setTitle("");
-               doc.setText("");
-               doc.setNew(true);
-               doc.setUserId(SharedPreferenceUtils.getPrefUserId(MainActivity.this));
-               intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY,doc);
-               startActivity(intent);
-
-//               TODO: Start new fragment for tablets
-            }
-        });
 
 
         StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(numberOfColumns(),StaggeredGridLayoutManager.VERTICAL);
@@ -187,12 +202,6 @@ public class MainActivity extends AppCompatActivity
         adapter = new DocGridAdapter(this,null);
 
 
-        progressBar.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                startDocSync();
-            }
-        });
 
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN
@@ -245,12 +254,7 @@ public class MainActivity extends AppCompatActivity
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.nav_logout:
-                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                        mAuth.signOut();
-                        Intent theIntent = new Intent(MainActivity.this,LoginActivity.class);
-                        startActivity(theIntent);
-                        SharedPreferenceUtils.invalidateUserDetails(MainActivity.this);
-                        finish();
+                        logoutUser();
                         break;
                 }
                 return false;
@@ -283,7 +287,6 @@ public class MainActivity extends AppCompatActivity
             DocService.syncDocs(MainActivity.this,
                     SharedPreferenceUtils.getPrefUserId(MainActivity.this));
         }else {
-            progressBar.setRefreshing(false);
 //            TODO:startDialog for internet
             Snackbar.make(drawerLayout,"Internet Connection not available. Check your connection and try again",Snackbar.LENGTH_LONG);
         }
@@ -321,10 +324,9 @@ public class MainActivity extends AppCompatActivity
             String action = intent.getAction();
             switch (action){
                 case DocService.ACTION_SYNC_STARTED:
-                    progressBar.setRefreshing(true);
+                    showProgressBar(true);
                     break;
                 case DocService.ACTION_SYNC_END:
-                    progressBar.setRefreshing(false);
                     break;
                 case ConnectivityManager.CONNECTIVITY_ACTION:
                     if(TeleUtils.isConnectedToNetwork(MainActivity.this)){
@@ -356,7 +358,50 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void showProgressBar(boolean show){
 
+        mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        docGridView.setVisibility(show ? View.GONE : View.VISIBLE);
+
+    }
+
+    /**
+     * Logs the user out of Firebase Auth and Google Sign in Client.
+     * Invalidates the stored user data and updates the widget
+     */
+    private void logoutUser(){
+
+        /*  Get Firebase Auth  instance*/
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        /*  Sign out of Firebase Authentication*/
+        mAuth.signOut();
+
+        /*  Invalidate stored user data */
+        SharedPreferenceUtils.invalidateUserDetails(MainActivity.this);
+
+        /*  Delete stored docs  */
+        DocService.deleteDoc(this,null);
+
+        /*  Get Google Sign in options */
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        /*  Get the Google sign in client and sign out*/
+       GoogleSignIn.getClient(this, gso).signOut();
+
+
+        /* Update the widget since the user is signed out   */
+        TeleWidgetService.updateTeleWidgets(this);
+
+        /*  Switch to the Login screen  */
+        Intent theIntent = new Intent(MainActivity.this,LoginActivity.class);
+        startActivity(theIntent);
+
+        /*  Remove  this activity from stack  */
+        finish();
+    }
 
 
     private void updateDocPositions(){
@@ -365,7 +410,7 @@ public class MainActivity extends AppCompatActivity
         for(int i=0;i<orderedDocs.size();i++){
 
             Doc d = orderedDocs.get(i);
-            Log.d(TAG,"Set Priority of "+d.getTitle()+" from "+d.getPriority() +" to "+(orderedDocs.size()-i));
+//            Log.d(TAG,"Set Priority of "+d.getTitle()+" from "+d.getPriority() +" to "+(orderedDocs.size()-i));
             int newPriority = orderedDocs.size()-i;
             d.setPriority(newPriority);
 

@@ -3,16 +3,16 @@ package com.ctp.theteleprompter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
@@ -71,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity
 
 
     @OnClick(R.id.sign_up_button)
-    private void initiateSignUp(){
+    protected void initiateSignUp(){
         signUpButton.setEnabled(false);
         String name = fullNameInput.getText().toString();
         String email = emailInput.getText().toString();
@@ -157,15 +157,12 @@ public class SignUpActivity extends AppCompatActivity
                                    Exception exception = task.getException();
 
                                    if(exception instanceof FirebaseAuthUserCollisionException){
+                                       /*   This user already exists. Ask user to sign in */
+                                      showSnackbarMessage(getString(R.string.account_exists_message));
 
-                                       Toast.makeText(SignUpActivity.this, "Account already exists!" +
-                                                       "Please Sign in",
-                                               Toast.LENGTH_SHORT).show();
                                    }else {
-                                       Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                       Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                               Toast.LENGTH_SHORT).show();
-
+//                                       Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                       showSnackbarMessage(getString(R.string.authentication_failed));
                                    }
                                     updateUI(null);
                                 }
@@ -211,6 +208,9 @@ public class SignUpActivity extends AppCompatActivity
     }
 
 
+    private void showSnackbarMessage(String message){
+        Snackbar.make(findViewById(R.id.sign_up_container),message,Snackbar.LENGTH_LONG).show();
+    }
 
     private void updateUI(FirebaseUser currentUser){
 
@@ -230,14 +230,24 @@ public class SignUpActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Called if user accepts to turn on the internet from the
+     * request internet dialog.
+     * @param dialogInterface The dialog interface of the RequestInternetDialog
+     */
     @Override
     public void onUserAcceptsInternetRequest(DialogInterface dialogInterface) {
-
+        startActivityForResult(new Intent(Settings.ACTION_WIFI_SETTINGS), 0);
     }
 
+    /**
+     * Called if user denies to turn on the internet from the
+     * request internet dialog.
+     * @param dialogInterface The dialog interface of the RequestInternetDialog
+     */
     @Override
     public void onUserDeniesInternetRequest(DialogInterface dialogInterface) {
-
+        /*  Do nothing for now  */
     }
 
     @Override

@@ -3,10 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:background="@color/colorPrimary"
     android:padding="@dimen/widget_margin">
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal"
+        android:layout_margin="8dp">
     <ImageButton
         android:id="@+id/widget_new_doc"
         android:layout_width="0dp"
@@ -16,12 +21,12 @@
         style="?android:attr/borderlessButtonStyle"
         />
 
-    <!--<View-->
-        <!--android:id="@+id/guideline3"-->
-        <!--android:layout_width="2dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:background="@color/colorWhite"-->
-        <!--/>-->
+    <FrameLayout
+        android:id="@+id/guideline3"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        />
     
     <ImageButton
         android:id="@+id/widget_edit_pin_doc"
@@ -31,12 +36,12 @@
         android:src="@drawable/ic_edit_black_24dp"
         style="?android:attr/borderlessButtonStyle"/>
 
-    <!--<View-->
-        <!--android:id="@+id/guideline4"-->
-        <!--android:layout_width="2dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:background="@color/colorWhite"-->
-        <!--/>-->
+    <FrameLayout
+        android:id="@+id/guideline4"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        />
 
     <ImageButton
         android:id="@+id/widget_play_pinned_doc"
@@ -47,7 +52,7 @@
         style="?android:attr/borderlessButtonStyle"
         />
 
-
+    </LinearLayout>
 
 
 

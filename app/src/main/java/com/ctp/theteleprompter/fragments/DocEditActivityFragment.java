@@ -136,21 +136,6 @@ public class DocEditActivityFragment extends Fragment
         textColorView.setBackgroundColor(textColor);
         backgroundColorView.setBackgroundColor(backgroundColor);
 
-        textColorView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                displayDialog(textColor,TextColorDialogFragment.TEXT_COLOR_PICKER);
-
-            }
-        });
-
-
-        backgroundColorView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               displayDialog(backgroundColor,TextColorDialogFragment.BACKGROUND_COLOR_PICK);
-            }
-        });
 
         scrollSpeedBar.setProgress(speedNumber);
         fontSizeBar.setProgress(fontSize);
@@ -190,6 +175,15 @@ public class DocEditActivityFragment extends Fragment
         return v;
     }
 
+    @OnClick(R.id.background_color_picker_view)
+    protected void onBackgroundColorPickerClicked(){
+        displayDialog(backgroundColor,TextColorDialogFragment.BACKGROUND_COLOR_PICK);
+    }
+
+    @OnClick(R.id.text_color_picker_view)
+    protected void onTextColorPickerClicked(){
+        displayDialog(textColor,TextColorDialogFragment.TEXT_COLOR_PICKER);
+    }
 
     @OnClick(R.id.play_button)
     public void onPlayButtonClick(View v){

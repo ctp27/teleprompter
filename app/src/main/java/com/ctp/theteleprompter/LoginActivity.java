@@ -1,7 +1,5 @@
 package com.ctp.theteleprompter;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
@@ -29,7 +27,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.fragments.ForgotPasswordDialogFragment;
@@ -47,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -134,6 +132,7 @@ public class LoginActivity extends AppCompatActivity
         /*  Get Firebase Auth instance  */
         mAuth = FirebaseAuth.getInstance();
 
+        /*  Build the google sign in options*/
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
@@ -141,6 +140,7 @@ public class LoginActivity extends AppCompatActivity
                 .requestIdToken(getString(R.string.webclient_server_id))
                 .build();
 
+        /*  Get the google client using google sign in options  */
         mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
 
 
@@ -257,9 +257,7 @@ public class LoginActivity extends AppCompatActivity
 
                             /*  Email sending successful! Yay notify the user! */
 
-                            Toast.makeText(LoginActivity.this,
-                                    getString(R.string.reset_password_dialog_email_sent),
-                                    Toast.LENGTH_LONG).show();
+                            updateUI(null,getString(R.string.reset_password_dialog_email_sent));
                         }
                         else {
                             /*  Email not sent due to some error. Get the exception    */
@@ -269,15 +267,11 @@ public class LoginActivity extends AppCompatActivity
 
                                 /*  This email was never registered.
                                 Notify the user to check the email  */
-                                Toast.makeText(LoginActivity.this,
-                                        getString(R.string.reset_password_dialog_emailnotfound),
-                                        Toast.LENGTH_LONG).show();
+                                updateUI(null,getString(R.string.reset_password_dialog_emailnotfound));
                             }
                             else {
                                 /*  Notify the user that an error occured   */
-                                Toast.makeText(LoginActivity.this,
-                                        getString(R.string.reset_password_dialog_email_error),
-                                        Toast.LENGTH_LONG).show();
+                                updateUI(null,getString(R.string.reset_password_dialog_email_error));
                             }
                         }
                     }
@@ -365,9 +359,15 @@ public class LoginActivity extends AppCompatActivity
                             } else {
                                 // If sign in fails, display a message to the user.
 //                                Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                updateUI(null, "Authentication failed");
+                                Exception exception = task.getException();
+
+                                if(exception instanceof FirebaseAuthInvalidCredentialsException){
+                                    updateUI(null,getString(R.string.login_incorrect_password));
+                                }else if(exception instanceof FirebaseAuthInvalidUserException){
+                                    updateUI(null,getString(R.string.login_account_not_exists));
+                                }else {
+                                    updateUI(null, getString(R.string.authentication_failed));
+                                }
                             }
 
                             // ...
@@ -463,17 +463,17 @@ public class LoginActivity extends AppCompatActivity
      *             Null if not authenticated.
      */
     private void updateUI(FirebaseUser user, String message){
-        showProgress(false);
+
 
         if(user==null){
-//            TODO: show error message
             if(message!=null) {
+                showProgress(false);
                 Snackbar.make(loginContainer, message, Snackbar.LENGTH_LONG).show();
             }
         }
         else {
-//            TODO: store his UId in preferences
-//            TODO: Sync his docs
+//             store his UId in preferences
+//           Sync his docs
 
             String userId = user.getUid();
             String email = user.getEmail();
@@ -521,38 +521,14 @@ public class LoginActivity extends AppCompatActivity
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+
     }
 
 
