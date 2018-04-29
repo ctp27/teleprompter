@@ -11,4 +11,9 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorPinSelected">#03A9F4</color>
     <color name="colorDarkNotification">#9E9E9E</color>
+
+    <color name="lightYellow">#FFF59D</color>
+    <color name="lightBlue">#80DEEA</color>
+    <color name="lightGreen">#A5D6A7</color>
+    <color name="colorBlack">#212121</color>
 </resources>

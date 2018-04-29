@@ -2,10 +2,12 @@ package com.ctp.theteleprompter.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import butterknife.BindColor;
 import butterknife.BindDrawable;
+import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -32,12 +36,14 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
     private int pinnedId = -1;
 
     private List<Doc> docList;
+    private int tutorialCounter;
 
     public DocGridAdapter(DocGridAdapterCallbacks mCallback, Cursor cursor) {
         this.mCallback = mCallback;
         this.cursor = cursor;
         docList = new ArrayList<>();
         pinnedId = SharedPreferenceUtils.getPinnedId((Context) mCallback);
+        tutorialCounter = 0;
     }
 
     public interface DocGridAdapterCallbacks{
@@ -59,6 +65,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
 
         Doc doc = docList.get(position);
 
+        setDocTitleSize(doc,holder);
 
         holder.docTitle.setText(doc.getTitle());
         holder.docPreview.setText(doc.getText());
@@ -70,7 +77,51 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             holder.pinButton.setImageDrawable(holder.pushPin);
         }
 
+
+
+        setCardBackgroundColor(doc,holder);
+
+
     }
+
+    private void setDocTitleSize(Doc doc, DocGridViewHolder holder) {
+        String docTitle = doc.getTitle();
+        if(docTitle.isEmpty()){
+            return;
+        }
+        int size;
+        int length = docTitle.length();
+        if(length>16 && length<=30){
+            size = holder.titleSizeMedium;
+
+        }
+        else if(length>30){
+            size = holder.titleSizeSmall;
+        }
+        else {
+            size=holder.titleSizeLarge;
+        }
+
+        holder.docTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,size);
+
+
+    }
+
+    private void setCardBackgroundColor(Doc doc, DocGridViewHolder holder) {
+
+        if(doc.isTutorial()){
+            if(tutorialCounter>2){
+                tutorialCounter =0;
+            }
+//            Log.d("Blahwah","Entered "+doc.getTitle()+" is "+doc.isTutorial());
+            holder.layoutContainer.setBackgroundColor(holder.colors[tutorialCounter]);
+            tutorialCounter++;
+        }else {
+            holder.layoutContainer.setBackgroundColor(Color.WHITE);
+        }
+    }
+
+
 
     public void deletePosition(int position){
         notifyItemRemoved(position);
@@ -145,8 +196,8 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
         @BindView(R.id.doc_text_preview)
         TextView docPreview;
 
-        @BindView(R.id.grid_card_view)
-        CardView cardView;
+        @BindView(R.id.doc_grid_item_constraintlayout)
+        ConstraintLayout layoutContainer;
 
         @BindView(R.id.doc_pin_button)
         ImageView pinButton;
@@ -157,18 +208,39 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
         @BindDrawable(R.drawable.ic_office_push_pin_selected)
         Drawable selectedPushPin;
 
+        @BindColor(R.color.lightBlue)
+        int colorLightBlue;
+
+        @BindColor(R.color.lightYellow)
+        int colorLightYellow;
+
+        @BindColor(R.color.lightGreen)
+        int colorLightGreen;
+
+        @BindInt(R.integer.title_size_small)
+        int titleSizeSmall;
+
+        @BindInt(R.integer.title_size_medium)
+        int titleSizeMedium;
+
+        @BindInt(R.integer.title_size_large)
+        int titleSizeLarge;
+
+         int[] colors;
+
+
         public DocGridViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             ButterKnife.bind(this,itemView);
             pinButton.setOnClickListener(this);
+            colors = new int[]{colorLightYellow,colorLightGreen,colorLightBlue};
         }
 
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            cursor.moveToPosition(position);
-            Doc doc = new Doc(cursor);
+            Doc doc = docList.get(position);
 
             switch (view.getId()){
                 case R.id.grid_card_view:

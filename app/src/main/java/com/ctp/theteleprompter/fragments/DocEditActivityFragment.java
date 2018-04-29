@@ -154,10 +154,11 @@ public class DocEditActivityFragment extends Fragment
 
             if(thisDoc.isNew()){
                 titleText.requestFocus();
-            }else {
-                textBody.requestFocus();
-                textBody.setSelection(thisDoc.getText().length());
             }
+//            else {
+//                textBody.requestFocus();
+////                textBody.setSelection(thisDoc.getText().length());
+//            }
         }
 
 

@@ -24,6 +24,8 @@ public class Doc implements Parcelable {
     @Exclude
     private boolean isNew;
 
+    @Exclude
+    private int isTutorial;
 
     private String cloudId;
 
@@ -31,6 +33,7 @@ public class Doc implements Parcelable {
 
     public Doc(){
         isNew = false;
+        isTutorial = 0;
     }
 
     public Doc(Cursor data){
@@ -41,6 +44,7 @@ public class Doc implements Parcelable {
         text = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_TEXT));
         priority = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_PRIORITY));
         userId = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_USER_NAME));
+        isTutorial = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_IS_TUTORIAL));
         isNew = false;
     }
 
@@ -96,6 +100,14 @@ public class Doc implements Parcelable {
         this.userId = userId;
     }
 
+    public int getIsTutorial() {
+        return isTutorial;
+    }
+
+    public void setIsTutorial(int isTutorial) {
+        this.isTutorial = isTutorial;
+    }
+
     @Exclude
     public boolean isNew() {
         return isNew;
@@ -103,6 +115,26 @@ public class Doc implements Parcelable {
 
     public void setNew(boolean aNew) {
         isNew = aNew;
+    }
+
+    @Exclude
+    public boolean isTutorial() {
+        if(isTutorial==1){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public void setTutorial(boolean tutorial) {
+
+        if(tutorial){
+            isTutorial = 1;
+        }
+        else {
+            isTutorial = 0;
+        }
+
     }
 
     @Exclude
@@ -115,6 +147,7 @@ public class Doc implements Parcelable {
         ContentValues contentValues = new ContentValues();
         contentValues.put(TeleContract.TeleEntry.COLUMN_TEXT,text);
         contentValues.put(TeleContract.TeleEntry.COLUMN_TITLE,title);
+        contentValues.put(TeleContract.TeleEntry.COLUMN_IS_TUTORIAL,isTutorial);
 
         if(userId !=null) {
             contentValues.put(TeleContract.TeleEntry.COLUMN_USER_NAME, userId);
@@ -126,8 +159,12 @@ public class Doc implements Parcelable {
         if(priority!=-1){
             contentValues.put(TeleContract.TeleEntry.COLUMN_PRIORITY,priority);
         }
+
+
         return contentValues;
     }
+
+
 
 
 
@@ -139,6 +176,7 @@ public class Doc implements Parcelable {
         priority = in.readInt();
         userId = in.readString();
         isNew = in.readByte()!=0;
+        isTutorial = in.readInt();
 
     }
 
@@ -171,5 +209,6 @@ public class Doc implements Parcelable {
         parcel.writeInt(priority);
         parcel.writeString(userId);
         parcel.writeByte((byte) (isNew ? 1 : 0));
+        parcel.writeInt(isTutorial);
     }
 }

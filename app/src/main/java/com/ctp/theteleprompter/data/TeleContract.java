@@ -37,6 +37,8 @@ public class TeleContract {
 
         public static final String COLUMN_PRIORITY = "priority";
 
+        public static final String COLUMN_IS_TUTORIAL = "is_tutorial";
+
 
     }
 

@@ -36,6 +36,7 @@
                     android:layout_marginTop="24dp"
                     android:background="@android:color/transparent"
                     android:hint="@string/doc_detail_title_hint"
+                    android:maxLength="60"
                     android:textSize="32sp"
                     android:textStyle="bold" />
 

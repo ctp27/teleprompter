@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.ctp.theteleprompter.R;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.model.Doc;
@@ -16,6 +18,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +32,7 @@ public class DocService extends IntentService {
 
     public static final String ACTION_UPDATE = "action-update-doc";
     public static final String ACTION_DELETE = "action-delete-doc";
+    private static final String ACTION_STARTUP_DOC_SYNC = "action-tutorial-doc";
     public static final String ACTION_SYNC_STARTED = "com.ctp.theteleprompter.sync.started";
     public static final String ACTION_SYNC_END = "com.ctp.theteleprompter.sync.ended";
 
@@ -82,6 +91,16 @@ public class DocService extends IntentService {
         context.startService(intent);
     }
 
+    public static void performStartupDocSync(Context context, String userId){
+
+        Intent intent = new Intent(context,DocService.class);
+        intent.setAction(ACTION_STARTUP_DOC_SYNC);
+        intent.putExtra(EXTRA_KEY,userId);
+        context.startService(intent);
+
+
+    }
+
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -103,6 +122,101 @@ public class DocService extends IntentService {
                 break;
             case ACTION_SYNC_DOCS:
                 handleActionSyncDocs(intent);
+                break;
+            case ACTION_STARTUP_DOC_SYNC:
+                handleActionStartupDocSync(intent);
+                break;
+        }
+
+    }
+
+    private void handleActionStartupDocSync(final Intent intent) {
+
+        final String userId = intent.getStringExtra(EXTRA_KEY);
+
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getChildrenCount()>0){
+                            handleActionSyncDocs(intent);
+                            return;
+                        }
+
+                        addTheTutorialDocs(userId);
+                        handleActionSyncDocs(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG,"Cancelled Tutorial Doc");
+                    }
+                });
+
+
+    }
+
+    private void addTheTutorialDocs(String userId) {
+
+        StringBuilder builder = new StringBuilder();
+        InputStream in = getResources().openRawResource(R.raw.tutorial_docs);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+
+        try {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+
+            JSONObject root = new JSONObject(builder.toString());
+
+
+            JSONArray docsArray = root.getJSONArray("docs");
+
+            for (int i = 0; i < docsArray.length(); i++) {
+
+                JSONObject thisObject = docsArray.getJSONObject(i);
+
+                String title = thisObject.getString("title");
+
+                String text = thisObject.getString("text");
+
+                boolean isTutorial = thisObject.getBoolean("isTutorial");
+
+//                Log.d("blahwah", "Writing " + isTutorial);
+
+
+                Doc doc = new Doc();
+                doc.setTitle(title);
+                doc.setText(text);
+                doc.setPriority(i+1);
+                doc.setTutorial(isTutorial);
+                doc.setUserId(userId);
+
+                String cloudId = getFirebaseDatabaseReference()
+                        .child(DATABASE_CHILD_DOCS)
+                        .child(doc.getUserId())
+                        .push()
+                        .getKey();
+
+                doc.setCloudId(cloudId);
+
+                getFirebaseDatabaseReference()
+                        .child(DATABASE_CHILD_DOCS)
+                        .child(doc.getUserId())
+                        .child(cloudId)
+                        .setValue(doc);
+
+                Log.d(TAG,"Adding tutorial to cloud");
+
+            }
+        }
+        catch (Exception e){
+
         }
 
     }
@@ -112,36 +226,40 @@ public class DocService extends IntentService {
         sendSyncBroadcast(true);
 
         final String userId = intent.getStringExtra(EXTRA_KEY);
-
+        Log.d(TAG,"Sybcing with cloud");
         getFirebaseDatabaseReference().child(DATABASE_CHILD_DOCS)
                 .child(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                if(dataSnapshot.getChildrenCount()==0){
+                    return;
+                }
                 List<ContentValues> contentValuesList = new ArrayList<>();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
 
 
                     Doc doc = snapshot.getValue(Doc.class);
+
                     doc.setUserId(userId);
 
                     contentValuesList.add(doc.getContentValues());
+
                 }
 
+                    ContentValues[] contentValues = contentValuesList.toArray(new ContentValues[1]);
 
-                ContentValues[] contentValues = contentValuesList.toArray(new ContentValues[1]);
+                    getContentResolver()
+                            .delete(TeleContract.TeleEntry.TELE_CONTENT_URI, null, null);
 
-                getContentResolver()
-                        .delete(TeleContract.TeleEntry.TELE_CONTENT_URI,null,null);
+                    getContentResolver()
+                            .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI, contentValues);
 
-                getContentResolver()
-                        .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues);
+                    sendSyncBroadcast(false);
 
-                sendSyncBroadcast(false);
+                    TeleWidgetService.updateTeleWidgets(DocService.this);
 
-                TeleWidgetService.updateTeleWidgets(DocService.this);
             }
 
             @Override
@@ -294,6 +412,7 @@ public class DocService extends IntentService {
 
         getContentResolver().update(TeleContract.TeleEntry.TELE_CONTENT_URI,contentValues,
                 TeleContract.TeleEntry._ID+"=?",new String[]{Integer.toString(doc.getId())});
+
 
 
         getFirebaseDatabaseReference()

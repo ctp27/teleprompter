@@ -13,10 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
-import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
-import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -54,6 +53,9 @@ public class SignUpActivity extends AppCompatActivity
     @BindView(R.id.sign_up_container)
     LinearLayout layoutContainer;
 
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+
 
 
     private FirebaseAuth mAuth;
@@ -72,6 +74,7 @@ public class SignUpActivity extends AppCompatActivity
 
     @OnClick(R.id.sign_up_button)
     protected void initiateSignUp(){
+
         signUpButton.setEnabled(false);
         String name = fullNameInput.getText().toString();
         String email = emailInput.getText().toString();
@@ -142,7 +145,7 @@ public class SignUpActivity extends AppCompatActivity
                 dialogFragment.show(getSupportFragmentManager(),REQUEST_INTERNET_DIALOG_TAG);
             }
             else {
-
+                showProgressBar(true);
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -170,13 +173,9 @@ public class SignUpActivity extends AppCompatActivity
                                 // ...
                             }
                         });
-
             }
 
         }
-
-
-
 
     }
 
@@ -194,17 +193,29 @@ public class SignUpActivity extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-
-                            SharedPreferenceUtils.setPrefUsername(SignUpActivity.this,name);
-                            SharedPreferenceUtils.setPrefUserId(SignUpActivity.this,user.getUid());
-                            SharedPreferenceUtils.setPrefEmail(SignUpActivity.this,user.getEmail());
-                            DocService.syncDocs(SignUpActivity.this,user.getUid());
-                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                            sendUserVerificationEmail(user);
+                            Intent intent = new Intent(SignUpActivity.this, EmailVerifyAcitivity.class);
+                            intent.putExtra(EmailVerifyAcitivity.INTENT_EXTRA_EMAIL,user.getEmail());
                             startActivity(intent);
+                            showProgressBar(false);
                         }
                     }
                 });
 
+    }
+
+
+    private void sendUserVerificationEmail(FirebaseUser user){
+
+        user.sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+//                        Snackbar.make(findViewById(R.id.email_verify_container),
+//                                getString(R.string.reset_password_dialog_email_sent),
+//                                Snackbar.LENGTH_LONG).show();
+                    }
+                });
     }
 
 
@@ -217,6 +228,7 @@ public class SignUpActivity extends AppCompatActivity
         if(currentUser == null){
 //            TODO: some error occured
             signUpButton.setEnabled(true);
+            showProgressBar(false);
             return;
 
         }
@@ -267,5 +279,11 @@ public class SignUpActivity extends AppCompatActivity
 
         Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
         startActivity(intent);
+    }
+
+
+    private void showProgressBar(boolean show){
+        layoutContainer.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+        progressBar.setVisibility(show? View.VISIBLE : View.INVISIBLE);
     }
 }

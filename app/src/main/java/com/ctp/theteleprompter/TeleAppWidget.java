@@ -143,7 +143,7 @@ public class TeleAppWidget extends AppWidgetProvider {
 
     private static PendingIntent getLoginPendingIntent(Context context){
 
-        Intent intent = new Intent(context,LoginActivity.class);
+        Intent intent = new Intent(context,LandingPageActivity.class);
 
         return PendingIntent
                 .getActivity(context,

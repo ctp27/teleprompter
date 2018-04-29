@@ -3,6 +3,7 @@ package com.ctp.theteleprompter;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,13 +54,33 @@ public class LandingPageActivity extends AppCompatActivity {
             new SendToSignUpTask().execute();
 
         }else {
-           redirectToMainActivity();
+            if(user.isEmailVerified()){
+                redirectToMainActivity();
+            }
+            else {
+                redirectToEmailVerify(user);
+            }
         }
 
 
    }
 
-   private void redirectToMainActivity(){
+    private void redirectToEmailVerify(FirebaseUser user) {
+
+        Intent intentA = new Intent(this,SignUpActivity.class);
+        Intent intentB = new Intent(this,EmailVerifyAcitivity.class);
+        intentB.putExtra(EmailVerifyAcitivity.INTENT_EXTRA_EMAIL,user.getEmail());
+
+        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+
+        taskStackBuilder.addNextIntent(intentA);
+        taskStackBuilder.addNextIntent(intentB);
+        startActivities(taskStackBuilder.getIntents());
+
+
+    }
+
+    private void redirectToMainActivity(){
        Intent intent = new Intent(this,MainActivity.class);
        startActivity(intent);
    }

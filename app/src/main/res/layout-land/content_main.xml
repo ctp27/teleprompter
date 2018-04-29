@@ -35,7 +35,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/empty_cursor_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:text="@string/empty_cursor_msg"
+        app:layout_constraintBottom_toTopOf="@+id/ad_view"
+        app:layout_constraintEnd_toEndOf="@+id/main_doc_recycler_view"
+        app:layout_constraintStart_toStartOf="@+id/main_doc_recycler_view"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/ad_view"

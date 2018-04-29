@@ -119,7 +119,6 @@
     <string name="card_transition_2">card_transition_2</string>
 
 
-
     <!--Request internet dialog-->
     <string name="request_internet_dialog_title">Internet Connection Required</string>
     <string name="request_internet_dialog_text">An active internet connection is required to proceed. Would you like to turn on the internet? </string>
@@ -137,4 +136,11 @@
     <string name="login_incorrect_password">Password is incorrect. Please try again</string>
     <string name="login_account_not_exists">No account exists with this email</string>
 
+    <string name="email_verification_msg">An email has been sent to %1$s. Follow the instructions in the mail to verify your account. Hit next after completing the email verification!</string>
+
+    <string name="email_verification_resend_mail">Didn\'t receive an email? </string>
+    <string name="resend_email_btn_txt">RESEND EMAIL</string>
+
+    <string name="email_unverified">Email not verified. Please follow the instructions sent on your email to complete the verification.</string>
+    <string name="empty_cursor_msg">You currently don\'t have any docs to display. Create a new doc by clicking the Add(+) button.</string>
 </resources>

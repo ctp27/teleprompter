@@ -433,7 +433,9 @@ public class LoginActivity extends AppCompatActivity
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithCredential:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
+//                               TODO : Add sample docs to cloud
                                 updateUI(user,null);
+
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -454,6 +456,7 @@ public class LoginActivity extends AppCompatActivity
             updateUI(null,"Google Sign in failed. Please check your google account and try again");
         }
     }
+
 
 
     /**
@@ -483,7 +486,9 @@ public class LoginActivity extends AppCompatActivity
             SharedPreferenceUtils.setPrefUserId(this,userId);
             SharedPreferenceUtils.setPrefUsername(this,name);
 
-            DocService.syncDocs(this,userId);
+
+
+            DocService.performStartupDocSync(this,userId);
 
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);

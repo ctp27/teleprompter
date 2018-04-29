@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.fab)
     FloatingActionButton floatingActionButton;
 
+    @BindView(R.id.empty_cursor_text)
+    TextView emptyCursorText;
+
     private SyncDocsReciever mSyncDocsReciever;
 
     private boolean docsMoved;
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity
         doc.setTitle("");
         doc.setText("");
         doc.setNew(true);
+        doc.setTutorial(false);
         doc.setUserId(SharedPreferenceUtils.getPrefUserId(MainActivity.this));
         intent.putExtra(DocEditActivity.EXTRA_PARCEL_KEY,doc);
         startActivity(intent);
@@ -144,14 +148,22 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        if(data==null){
+
+        if(data==null || data.getCount()==0){
             showProgressBar(false);
+            showEmptyCursorMessage(true);
             return;
         }
-
+        showEmptyCursorMessage(false);
         showProgressBar(false);
         adapter.swapCursor(data);
-        Log.d(TAG,"Calles Swap cursor");
+        Log.d(TAG,"Cursor count is "+data.getCount());
+    }
+
+    private void showEmptyCursorMessage(boolean show) {
+
+        emptyCursorText.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        docGridView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override
@@ -184,6 +196,7 @@ public class MainActivity extends AppCompatActivity
         return nColumns;
     }
 
+
     @Override
     public void onDocClicked(Doc doc) {
         Intent intent = new Intent(this, DocEditActivity.class);
@@ -191,10 +204,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+
+
     private void initializeWidgets(){
-
-
-
 
         StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(numberOfColumns(),StaggeredGridLayoutManager.VERTICAL);
 
@@ -327,6 +339,7 @@ public class MainActivity extends AppCompatActivity
                     showProgressBar(true);
                     break;
                 case DocService.ACTION_SYNC_END:
+                    showProgressBar(false);
                     break;
                 case ConnectivityManager.CONNECTIVITY_ACTION:
                     if(TeleUtils.isConnectedToNetwork(MainActivity.this)){
@@ -360,8 +373,8 @@ public class MainActivity extends AppCompatActivity
 
     private void showProgressBar(boolean show){
 
-        mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
-        docGridView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mProgressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        docGridView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
 
     }
 
@@ -380,7 +393,7 @@ public class MainActivity extends AppCompatActivity
         /*  Invalidate stored user data */
         SharedPreferenceUtils.invalidateUserDetails(MainActivity.this);
 
-        /*  Delete stored docs  */
+        /*  Delete locally stored docs  */
         DocService.deleteDoc(this,null);
 
         /*  Get Google Sign in options */
@@ -417,5 +430,6 @@ public class MainActivity extends AppCompatActivity
             DocService.moveDocs(MainActivity.this,d);
 
         }
+        docsMoved = false;
     }
 }

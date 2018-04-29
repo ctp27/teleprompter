@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-
+<integer name="title_size_small">13</integer>
+    <integer name="title_size_medium">16</integer>
+    <integer name="title_size_large">24</integer>
 </resources>

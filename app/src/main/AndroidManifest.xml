@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -65,7 +65,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SignUpActivity"
-            android:noHistory="true"
+            android:launchMode="singleTop"
             android:parentActivityName=".LoginActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -93,9 +93,17 @@
                 android:resource="@xml/tele_app_widget_info" />
         </receiver>
 
-        <service android:name=".services.TeleWidgetService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-        
+        <service
+            android:name=".services.TeleWidgetService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <activity android:name=".EmailVerifyAcitivity"
+            android:parentActivityName=".SignUpActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SignUpActivity" />
+        </activity>
     </application>
 
 </manifest>
