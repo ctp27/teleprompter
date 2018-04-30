@@ -42,6 +42,7 @@ public class DocService extends IntentService {
     private static final String EXTRA_KEY = "key_extra_key";
 
     private static final String DATABASE_DOC_CHILD_PRIORITY= "priority";
+    private static final String DATABASE_DOC_CHILD_PING= "ping";
 
     public static final String TAG = DocService.class.getSimpleName();
     private static final String DATABASE_CHILD_DOCS = "docs";
@@ -133,29 +134,57 @@ public class DocService extends IntentService {
     private void handleActionStartupDocSync(final Intent intent) {
 
         final String userId = intent.getStringExtra(EXTRA_KEY);
+        Doc pingDoc = new Doc();
+        pingDoc.setPing(true);
 
         getFirebaseDatabaseReference()
                 .child(DATABASE_CHILD_DOCS)
                 .child(userId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(DATABASE_DOC_CHILD_PING)
+                .setValue(pingDoc, new DatabaseReference.CompletionListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.getChildrenCount()>0){
-                            handleActionSyncDocs(intent);
-                            return;
-                        }
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                        addTheTutorialDocs(userId);
-                        handleActionSyncDocs(intent);
-                    }
+                        getFirebaseDatabaseReference()
+                                .child(DATABASE_CHILD_DOCS)
+                                .child(userId)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG,"Cancelled Tutorial Doc");
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.getChildrenCount()>1){
+                                    Log.d(TAG,"Datasnapshot exists, dont add" +dataSnapshot.getChildrenCount());
+                                    removeChildPing(userId);
+                                    handleActionSyncDocs(intent);
+                                    return;
+                                }
+                                Log.d(TAG,"Datasnapshot doesnt exist. Add!");
+                                addTheTutorialDocs(userId);
+                                removeChildPing(userId);
+
+                                handleActionSyncDocs(intent);
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.d(TAG,"Cancelled Tutorial Doc");
+                            }
+                        });
                     }
                 });
 
 
+
+    }
+
+
+    private void removeChildPing(String userId){
+        getFirebaseDatabaseReference()
+                .child(DATABASE_CHILD_DOCS)
+                .child(userId)
+                .child(DATABASE_DOC_CHILD_PING).removeValue();
     }
 
     private void addTheTutorialDocs(String userId) {
@@ -205,7 +234,7 @@ public class DocService extends IntentService {
 
                 doc.setCloudId(cloudId);
 
-                getFirebaseDatabaseReference()
+                        getFirebaseDatabaseReference()
                         .child(DATABASE_CHILD_DOCS)
                         .child(doc.getUserId())
                         .child(cloudId)
@@ -224,51 +253,62 @@ public class DocService extends IntentService {
     private void handleActionSyncDocs(Intent intent) {
 
         sendSyncBroadcast(true);
+        Doc doc = new Doc();
+        doc.setPing(true);
 
         final String userId = intent.getStringExtra(EXTRA_KEY);
         Log.d(TAG,"Sybcing with cloud");
         getFirebaseDatabaseReference().child(DATABASE_CHILD_DOCS)
                 .child(userId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(DATABASE_DOC_CHILD_PING)
+                .setValue(doc, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        getFirebaseDatabaseReference()
+                                .child(DATABASE_CHILD_DOCS)
+                                .child(userId)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.getChildrenCount()==0){
+                                            sendSyncBroadcast(false);
+                                            removeChildPing(userId);
+                                            return;
+                                        }
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getChildrenCount()==0){
-                    return;
-                }
-                List<ContentValues> contentValuesList = new ArrayList<>();
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                        List<ContentValues> contentValuesList = new ArrayList<>();
+                                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
 
+                                            Doc doc = snapshot.getValue(Doc.class);
+                                            if(doc!=null && !doc.isPing()) {
+                                                doc.setUserId(userId);
+                                                contentValuesList.add(doc.getContentValues());
+                                                Log.d(TAG,doc.getTitle());
+                                            }
 
-                    Doc doc = snapshot.getValue(Doc.class);
+                                        }
 
-                    doc.setUserId(userId);
+                                        ContentValues[] contentValues = contentValuesList.toArray(new ContentValues[1]);
 
-                    contentValuesList.add(doc.getContentValues());
+                                        getContentResolver()
+                                                .delete(TeleContract.TeleEntry.TELE_CONTENT_URI, null, null);
 
-                }
+                                        getContentResolver()
+                                                .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI, contentValues);
 
-                    ContentValues[] contentValues = contentValuesList.toArray(new ContentValues[1]);
+                                        sendSyncBroadcast(false);
+                                        removeChildPing(userId);
+                                        TeleWidgetService.updateTeleWidgets(DocService.this);
+                                    }
 
-                    getContentResolver()
-                            .delete(TeleContract.TeleEntry.TELE_CONTENT_URI, null, null);
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        sendSyncBroadcast(false);
+                                    }
+                                });
+                    }
+                });
 
-                    getContentResolver()
-                            .bulkInsert(TeleContract.TeleEntry.TELE_CONTENT_URI, contentValues);
-
-                    sendSyncBroadcast(false);
-
-                    TeleWidgetService.updateTeleWidgets(DocService.this);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                sendSyncBroadcast(false);
-
-
-            }
-        });
 
 
     }
@@ -424,11 +464,10 @@ public class DocService extends IntentService {
     }
 
 
-    private DatabaseReference getFirebaseDatabaseReference(){
+    public static DatabaseReference getFirebaseDatabaseReference(){
         if(mDb==null) {
             mDb = FirebaseDatabase.getInstance();
             mDb.setPersistenceEnabled(true);
-
             mDb.getReference("docs").keepSynced(true);
         }
         return mDb.getReference();

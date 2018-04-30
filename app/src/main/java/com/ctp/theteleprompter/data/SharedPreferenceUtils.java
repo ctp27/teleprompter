@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.preference.PreferenceManager;
 
 import com.ctp.theteleprompter.R;
+import com.ctp.theteleprompter.services.TeleWidgetService;
 
 public class SharedPreferenceUtils {
 
@@ -28,6 +29,7 @@ public class SharedPreferenceUtils {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(context.getString(R.string.pref_background_color_key), color);
         editor.apply();
+        TeleWidgetService.updateTeleWidgets(context);
     }
 
     public static void setDefaultTextColor(Context context, int color){
@@ -35,6 +37,7 @@ public class SharedPreferenceUtils {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(context.getString(R.string.pref_text_color_key), color);
         editor.apply();
+        TeleWidgetService.updateTeleWidgets(context);
     }
 
 

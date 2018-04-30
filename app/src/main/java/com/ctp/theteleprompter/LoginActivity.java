@@ -71,6 +71,9 @@ public class LoginActivity extends AppCompatActivity
     /**
      * Id to identity READ_CONTACTS permission request.
      */
+
+    private static final int LOGIN_TYPE_EMAIL_PASS = 900;
+    private static final int LOGIN_TYPE_GOOGLE_SIGN_IN = 901;
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final int RC_SIGN_IN = 101;
     private static final String FORGOT_PASSWORD_DIALOG_TAG = "Fogot-password_dialog";
@@ -215,6 +218,7 @@ public class LoginActivity extends AppCompatActivity
         /*  Create and start the Sign Up activity   */
         Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
         startActivity(intent);
+        finish();
     }
 
     /**
@@ -458,6 +462,10 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
+    private void startSignIn(FirebaseUser user, int loginType){
+
+
+    }
 
     /**
      * Updates the UI based on the login attempt results. Proceeds to login activity if user

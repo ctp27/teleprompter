@@ -13,7 +13,7 @@
 
 
     <FrameLayout
-        android:layout_width="240dp"
+        android:layout_width="@dimen/dimen_240"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
         android:padding="16dp"
@@ -36,7 +36,7 @@
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/dimen_24"
         android:padding="@dimen/activity_horizontal_margin">
 
         <LinearLayout
@@ -79,13 +79,19 @@
             </android.support.design.widget.TextInputLayout>
 
             <!-- Login progress -->
-            <ProgressBar
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/login_progress"
-                style="?android:attr/progressBarStyleLarge"
+                android:visibility="gone"
+                >
+            <ProgressBar
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone" />
+                android:layout_marginBottom="@dimen/dimen_8"
+                />
+            </FrameLayout>
 
 
             <LinearLayout
@@ -100,7 +106,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/action_sign_in"
-                    android:layout_margin="16dp"
+                    android:layout_margin="@dimen/dimen_16"
                     />
 
 
@@ -120,12 +126,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/dimen_16"
                 android:gravity="center_horizontal">
                 <View
                     android:layout_width="100dp"
                     android:layout_height="1dp"
-                    android:layout_margin="16dp"
+                    android:layout_margin="@dimen/dimen_16"
                     android:background="@color/colorPrimaryLight"
                     />
                 <TextView
@@ -136,7 +142,7 @@
                 <View
                     android:layout_width="100dp"
                     android:layout_height="1dp"
-                    android:layout_margin="16dp"
+                    android:layout_margin="@dimen/dimen_16"
                     android:background="@color/colorPrimaryLight"
                     />
 
@@ -145,14 +151,14 @@
                 android:id="@+id/google_sign_in_button"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/dimen_8"
                 android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/sign_up_button"
                 android:background="@color/colorPrimaryDark"
                 android:textColor="@color/colorWhite"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/dimen_8"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_sign_up"

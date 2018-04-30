@@ -7,9 +7,9 @@
 
 
 
-    <integer name="font_size_small_sp">24</integer>
-    <integer name="font_size_medium_sp">32</integer>
-    <integer name="font_size_large_sp">40</integer>
-    <integer name="font_size_xlarge_sp">48</integer>
+    <integer name="font_size_small_sp">40</integer>
+    <integer name="font_size_medium_sp">48</integer>
+    <integer name="font_size_large_sp">56</integer>
+    <integer name="font_size_xlarge_sp">64</integer>
 
 </resources>

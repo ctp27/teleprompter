@@ -9,6 +9,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 
 import com.ctp.theteleprompter.R;
+import com.ctp.theteleprompter.services.TeleWidgetService;
 
 public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener{
@@ -67,6 +68,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
             }
         }
 
+        TeleWidgetService.updateTeleWidgets(getContext());
+
     }
 
     @Override
@@ -80,4 +83,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onDestroy();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
+
+
 }

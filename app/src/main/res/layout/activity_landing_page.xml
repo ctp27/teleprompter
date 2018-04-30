@@ -16,10 +16,8 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textStyle="bold"
-        android:textSize="40sp"
+        android:textSize="@dimen/dimen_40"
         android:textColor="@color/colorWhite"
         />
-
-
 
 </LinearLayout>

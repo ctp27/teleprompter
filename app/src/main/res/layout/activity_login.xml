@@ -16,7 +16,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="@dimen/dimen_120"
         android:background="@color/colorPrimary"
         android:padding="16dp"
         android:id="@+id/app_banner_view"
@@ -29,8 +29,8 @@
             android:textSize="32sp"
             android:textColor="@color/colorWhite"
             android:gravity="bottom"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="@dimen/dimen_16"
+            android:layout_marginLeft="@dimen/dimen_16"
             android:textStyle="bold"/>
 
     </FrameLayout>
@@ -44,7 +44,7 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/dimen_8"
             android:layout_gravity="center"
             android:gravity="center"/>
     </FrameLayout>
@@ -52,7 +52,7 @@
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/dimen_24"
         android:padding="@dimen/activity_horizontal_margin">
 
         <LinearLayout
@@ -64,8 +64,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="@dimen/dimen_16"
+                android:layout_marginEnd="@dimen/dimen_16"
                 >
 
                 <android.support.v7.widget.AppCompatAutoCompleteTextView
@@ -82,8 +82,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp">
+                android:layout_marginStart="@dimen/dimen_16"
+                android:layout_marginEnd="@dimen/dimen_16">
 
                 <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/password"
@@ -113,7 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_sign_in"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/dimen_16"
                 />
 
 
@@ -135,12 +135,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/dimen_16"
                 android:gravity="center_horizontal">
+
                 <View
                     android:layout_width="100dp"
                     android:layout_height="1dp"
-                    android:layout_margin="16dp"
+                    android:layout_margin="@dimen/dimen_16"
                     android:background="@color/colorPrimaryLight"
                     />
                 <TextView
@@ -151,7 +152,7 @@
                 <View
                     android:layout_width="100dp"
                     android:layout_height="1dp"
-                    android:layout_margin="16dp"
+                    android:layout_margin="@dimen/dimen_16"
                     android:background="@color/colorPrimaryLight"
                     />
 
@@ -161,14 +162,14 @@
                 android:id="@+id/google_sign_in_button"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="@dimen/dimen_16"
+                android:layout_marginEnd="@dimen/dimen_16"
                 android:layout_height="wrap_content" />
 
             <Button
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginTop="@dimen/dimen_16"
+                android:layout_marginStart="@dimen/dimen_16"
+                android:layout_marginEnd="@dimen/dimen_16"
                 android:id="@+id/sign_up_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

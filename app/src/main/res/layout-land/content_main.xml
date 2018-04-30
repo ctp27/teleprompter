@@ -54,6 +54,17 @@
         app:layout_constraintStart_toStartOf="@+id/main_doc_recycler_view"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="@dimen/dimen_16"
+        android:layout_marginEnd="@dimen/dimen_16"
+        android:layout_marginRight="@dimen/dimen_16"
+        android:src="@drawable/ic_add_white_24dp"
+        ads:layout_constraintBottom_toTopOf="@+id/ad_view"
+        ads:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/ad_view"

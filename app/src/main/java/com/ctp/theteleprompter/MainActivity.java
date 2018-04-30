@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.ad_view)
     AdView mAdView;
-
+    
     @BindColor(R.color.colorDanger)
     int colorDanger;
 
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity
         docsMoved = false;
         initializeWidgets();
 
+
         if(savedInstanceState==null && getIntent().hasExtra(INTENT_EXTRA_NO_PINNED_DOC)){
             if(getIntent().getBooleanExtra(INTENT_EXTRA_NO_PINNED_DOC,false)){
                 /*  If coming from the widget and no docs pinned    */
@@ -117,6 +118,8 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
 
     /**
      * Handles the clicks on the floating add action button. Opens the

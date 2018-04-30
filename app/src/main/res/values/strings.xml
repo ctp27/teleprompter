@@ -143,4 +143,12 @@
 
     <string name="email_unverified">Email not verified. Please follow the instructions sent on your email to complete the verification.</string>
     <string name="empty_cursor_msg">You currently don\'t have any docs to display. Create a new doc by clicking the Add(+) button.</string>
+    <string name="verification_thanks">Thank you for verifying your email!</string>
+    <string name="open_email">Open Email</string>
+    <string name="letter_r">R</string>
+    <string name="letter_green">G</string>
+    <string name="letter_b">B</string>
+    <string name="text_color_label_text">Text color</string>
+
+
 </resources>

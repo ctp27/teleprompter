@@ -19,6 +19,7 @@ import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
 import com.ctp.theteleprompter.utils.TeleUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
@@ -136,6 +137,7 @@ public class SignUpActivity extends AppCompatActivity
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
+            signUpButton.setEnabled(true);
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
@@ -143,6 +145,7 @@ public class SignUpActivity extends AppCompatActivity
             if (!TeleUtils.isConnectedToNetwork(this)) {
                 RequestInternetDialogFragment dialogFragment = new RequestInternetDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(),REQUEST_INTERNET_DIALOG_TAG);
+                signUpButton.setEnabled(true);
             }
             else {
                 showProgressBar(true);
@@ -198,6 +201,7 @@ public class SignUpActivity extends AppCompatActivity
                             intent.putExtra(EmailVerifyAcitivity.INTENT_EXTRA_EMAIL,user.getEmail());
                             startActivity(intent);
                             showProgressBar(false);
+                            finish();
                         }
                     }
                 });
@@ -207,7 +211,8 @@ public class SignUpActivity extends AppCompatActivity
 
     private void sendUserVerificationEmail(FirebaseUser user){
 
-        user.sendEmailVerification()
+        ActionCodeSettings actionCodeSettings = TeleUtils.getActionCodeSettingsForUser(user);
+        user.sendEmailVerification(actionCodeSettings)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

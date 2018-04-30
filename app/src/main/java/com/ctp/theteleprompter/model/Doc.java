@@ -29,11 +29,13 @@ public class Doc implements Parcelable {
 
     private String cloudId;
 
+    private boolean isPing;
 
 
     public Doc(){
         isNew = false;
         isTutorial = 0;
+        isPing = false;
     }
 
     public Doc(Cursor data){
@@ -46,6 +48,7 @@ public class Doc implements Parcelable {
         userId = data.getString(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_USER_NAME));
         isTutorial = data.getInt(data.getColumnIndex(TeleContract.TeleEntry.COLUMN_IS_TUTORIAL));
         isNew = false;
+        isPing = false;
     }
 
     @Exclude
@@ -83,6 +86,13 @@ public class Doc implements Parcelable {
     }
 
 
+    public boolean isPing() {
+        return isPing;
+    }
+
+    public void setPing(boolean ping) {
+        isPing = ping;
+    }
 
     public void setTitle(String title) {
         this.title = title;
@@ -177,6 +187,7 @@ public class Doc implements Parcelable {
         userId = in.readString();
         isNew = in.readByte()!=0;
         isTutorial = in.readInt();
+        isPing = in.readByte()!=0;
 
     }
 
@@ -210,5 +221,6 @@ public class Doc implements Parcelable {
         parcel.writeString(userId);
         parcel.writeByte((byte) (isNew ? 1 : 0));
         parcel.writeInt(isTutorial);
+        parcel.writeByte((byte) (isPing ? 1: 0));
     }
 }

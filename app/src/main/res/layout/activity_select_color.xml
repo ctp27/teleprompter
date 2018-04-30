@@ -8,14 +8,14 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="@dimen/dimen_8"
         tools:context="com.google.developer.colorvalue.AddCardActivity">
 
         <android.support.v7.widget.CardView
             android:id="@+id/colorFrame"
             android:layout_width="0dp"
-            android:layout_height="120dp"
-            android:layout_margin="8dp"
+            android:layout_height="@dimen/dimen_120"
+            android:layout_margin="@dimen/dimen_8"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent">
@@ -36,9 +36,9 @@
             android:id="@+id/text_red"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="R"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:text="@string/letter_r"
+            android:layout_marginStart="@dimen/dimen_8"
+            android:layout_marginLeft="@dimen/dimen_8"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seek_red" />
 
@@ -58,9 +58,9 @@
             android:id="@+id/text_green"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:text="G"
+            android:layout_marginStart="@dimen/dimen_8"
+            android:layout_marginLeft="@dimen/dimen_8"
+            android:text="@string/letter_green"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seek_green" />
 
@@ -68,9 +68,9 @@
             android:id="@+id/seek_green"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/dimen_8"
+            android:layout_marginLeft="@dimen/dimen_8"
+            android:layout_marginTop="@dimen/dimen_8"
             android:max="255"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/text_green"
@@ -80,9 +80,9 @@
             android:id="@+id/text_blue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:text="B"
+            android:layout_marginStart="@dimen/dimen_8"
+            android:layout_marginLeft="@dimen/dimen_8"
+            android:text="@string/letter_b"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seek_blue" />
 
@@ -90,9 +90,9 @@
             android:id="@+id/seek_blue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:layout_marginStart="@dimen/dimen_8"
+            android:layout_marginLeft="@dimen/dimen_8"
             android:max="255"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/text_blue"

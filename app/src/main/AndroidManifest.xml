@@ -20,9 +20,8 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"/>
 
-        </activity>
         <activity
             android:name=".SlideShowActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -97,12 +96,9 @@
             android:name=".services.TeleWidgetService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <activity android:name=".EmailVerifyAcitivity"
-            android:parentActivityName=".SignUpActivity"
+        <activity
+            android:name=".EmailVerifyAcitivity"
             >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".SignUpActivity" />
         </activity>
     </application>
 

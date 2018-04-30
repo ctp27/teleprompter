@@ -86,7 +86,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
 
     private void setDocTitleSize(Doc doc, DocGridViewHolder holder) {
         String docTitle = doc.getTitle();
-        if(docTitle.isEmpty()){
+        if(docTitle == null || docTitle.isEmpty()){
             return;
         }
         int size;

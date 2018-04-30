@@ -426,23 +426,23 @@ public class SlideShowActivity extends AppCompatActivity
                 scrollOffset = 1;
                 break;
             case 1:
-                animationDelayMillis = 25;
+                animationDelayMillis = 30;
                 scrollOffset = 2;
                 break;
 
             case 2:
-                animationDelayMillis = 25;
+                animationDelayMillis = 30;
                 scrollOffset = 3;
                 break;
 
             case 3:
                 animationDelayMillis = 25;
-                scrollOffset = 4;
+                scrollOffset = 3;
                 break;
 
             case 4:
-                animationDelayMillis = 25;
-                scrollOffset = 5;
+                animationDelayMillis = 30;
+                scrollOffset = 4;
                 break;
         }
 
@@ -455,25 +455,26 @@ public class SlideShowActivity extends AppCompatActivity
         int size = 16;
         switch (fontSize){
 
+
             case 0:
-                size = 24;
+                size = R.integer.font_size_small_sp;
                 break;
 
             case 1:
-                size = 32;
+                size = R.integer.font_size_medium_sp;
                 break;
 
             case 2:
-                size = 40;
+                size = R.integer.font_size_large_sp;
                 break;
 
             case 3:
-                size = 48;
+                size = R.integer.font_size_xlarge_sp;
                 break;
 
         }
 
-        contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP,size);
+        contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP,getResources().getInteger(size));
 
     }
 

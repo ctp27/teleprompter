@@ -31,7 +31,7 @@
             tools:text="@string/dummy_content"
             tools:textColor="#33b5e5"
             tools:textSize="32sp"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/dimen_8"
             tools:textStyle="bold" />
 
     </com.ctp.theteleprompter.ui.SlideShowScrollView>

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/email_verify_container"
     tools:context=".EmailVerifyAcitivity">
 
@@ -17,6 +21,16 @@
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline7"
         android:src="@drawable/ic_iconmonstr_email_10"/>
+
+    <ImageView
+        android:id="@+id/email_verified_img"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_email_verified"
+        app:layout_constraintBottom_toBottomOf="@+id/email_img"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline5"
@@ -50,11 +64,11 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/dimen_16"
+        android:layout_marginLeft="@dimen/dimen_16"
+        android:layout_marginRight="@dimen/dimen_16"
+        android:layout_marginStart="@dimen/dimen_16"
+        android:layout_marginTop="@dimen/dimen_24"
         android:gravity="center"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,26 +77,45 @@
         tools:text="An email has been sent to abc@example.com. Follow the instructions in the
             mail to confirm your email. Hit next after completing the verification process" />
 
+
+    <TextView
+        android:id="@+id/textView_verified"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_24"
+        android:layout_marginLeft="@dimen/dimen_24"
+        android:layout_marginRight="@dimen/dimen_24"
+        android:layout_marginStart="@dimen/dimen_24"
+        android:layout_marginTop="@dimen/dimen_24"
+        android:gravity="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        android:text="@string/verification_thanks" />
+
     <TextView
         android:id="@+id/resend_mail_msg"
         android:layout_width="0dp"
-        android:layout_height="22dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_16"
+        android:layout_marginTop="@dimen/dimen_16"
         android:gravity="center"
         android:text="@string/email_verification_resend_mail"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/resend_mail_btn"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@id/next_btn" />
+        app:layout_constraintTop_toBottomOf="@id/open_email_btn" />
 
     <Button
-        android:id="@+id/next_btn"
+        android:id="@+id/open_email_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/dimen_16"
         android:background="@color/colorAccent"
-        android:text="Next"
+        android:text="@string/open_email"
         android:textColor="@color/colorWhite"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintHorizontal_bias="1.0"
@@ -93,16 +126,47 @@
         android:id="@+id/resend_mail_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textStyle="bold"
-        android:textColor="@color/colorPinSelected"
+        android:layout_marginBottom="@dimen/dimen_8"
+        android:layout_marginEnd="@dimen/dimen_8"
+        android:layout_marginLeft="@dimen/dimen_8"
+        android:layout_marginRight="@dimen/dimen_8"
+        android:layout_marginStart="@dimen/dimen_8"
         android:text="@string/resend_email_btn_txt"
+        android:textColor="@color/colorPinSelected"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/resend_mail_msg"
-        app:layout_constraintStart_toStartOf="@+id/resend_mail_msg"
-        app:layout_constraintTop_toBottomOf="@+id/resend_mail_msg" />
+        app:layout_constraintStart_toStartOf="@+id/resend_mail_msg" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_verified" />
+
+
+    <android.support.constraint.Group
+        android:id="@+id/display_not_verified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="open_email_btn,resend_mail_btn,resend_mail_msg,textView,email_img"
+        />
+
+    <android.support.constraint.Group
+        android:id="@+id/display_verified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="email_verified_img,textView_verified,progress_bar"
+        />
+
+
+
 
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

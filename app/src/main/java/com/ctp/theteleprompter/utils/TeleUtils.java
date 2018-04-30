@@ -4,6 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.google.firebase.auth.ActionCodeSettings;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +34,21 @@ public class TeleUtils{
 
     public static boolean isValidPassword(String password){
         return password.length()>6 && !password.trim().isEmpty();
+    }
+
+
+
+    public static ActionCodeSettings getActionCodeSettingsForUser(FirebaseUser user){
+
+        String url = "http://www.teleprompter.com/verify?uid=" + user.getUid();
+
+        return ActionCodeSettings.newBuilder()
+                .setUrl(url)
+                // The default for this is populated with the current android package name.
+                .setAndroidPackageName("com.ctp.theteleprompter", false, null)
+                .setHandleCodeInApp(false)
+                .build();
+
     }
 
 
