@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android" >
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,23 +15,25 @@
 
     <ImageView
         android:id="@+id/email_img"
-        android:layout_width="@dimen/dimen_200"
-        android:layout_height="@dimen/dimen_200"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
         app:layout_constraintTop_toTopOf="@+id/guideline7"
-        android:src="@drawable/ic_iconmonstr_email_10"/>
+        app:srcCompat="@drawable/ic_iconmonstr_email_10" />
+
 
     <ImageView
         android:id="@+id/email_verified_img"
-        android:layout_width="@dimen/dimen_200"
-        android:layout_height="@dimen/dimen_200"
-        android:src="@drawable/ic_email_verified"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/email_img"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
-        app:layout_constraintTop_toTopOf="@+id/guideline7" />
+        app:layout_constraintTop_toTopOf="@+id/guideline7"
+        app:srcCompat="@drawable/ic_email_verified" />
+
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline5"
@@ -161,7 +164,7 @@
         android:id="@+id/display_verified"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:constraint_referenced_ids="email_verified_img,textView_verified,progress_bar"
         />
 

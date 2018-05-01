@@ -30,6 +30,7 @@
                 android:id="@+id/text_color_picker_view"
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
+                android:contentDescription="@string/cd_text_color_selector"
                 app:show_text="false"
                 tools:background="@color/colorWhite" />
 
@@ -52,6 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:elevation="@dimen/dimen_6"
+                android:contentDescription="@string/cd_background_color_chooser"
                 app:show_text="false"
                 tools:background="@color/colorWhite" />
         </android.support.v7.widget.CardView>
@@ -67,12 +69,14 @@
             android:layout_marginRight="@dimen/dimen_8"
             android:layout_marginStart="@dimen/dimen_8"
             android:layout_marginTop="@dimen/dimen_8"
+            android:contentDescription="@string/cd_play_btn"
             android:background="@drawable/round_button_shape"
-            android:src="@drawable/ic_play_arrow_white_24dp"
+            app:srcCompat="@drawable/ic_play_arrow_white_24dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline" />
+
 
         <SeekBar
             android:id="@+id/seekBar_speed"
@@ -81,9 +85,11 @@
             android:layout_marginLeft="@dimen/dimen_16"
             android:layout_marginStart="@dimen/dimen_16"
             android:max="4"
+            android:contentDescription="@string/scroll_speed_selector"
             app:layout_constraintEnd_toStartOf="@+id/seekBar_speed_display"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/seekBar_speed_lab" />
+
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline"
@@ -92,6 +98,7 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.35" />
 
+
         <android.support.constraint.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
@@ -99,16 +106,19 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.64" />
 
+
         <SeekBar
             android:id="@+id/seekBar_font_size"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dimen_8"
             android:max="3"
+            android:contentDescription="@string/cd_font_size_selector"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintEnd_toStartOf="@+id/font_size_display"
             app:layout_constraintStart_toStartOf="@+id/seekBar_speed"
             app:layout_constraintTop_toBottomOf="@+id/font_size_label" />
+
 
         <TextView
             android:id="@+id/text_color_picker_label"
@@ -116,7 +126,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dimen_8"
             android:gravity="center"
-            android:text="Text color"
+            android:text="@string/text_color_label_text"
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="@+id/colorViewFrame"
             app:layout_constraintStart_toStartOf="@+id/colorViewFrame"

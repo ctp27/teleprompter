@@ -27,6 +27,14 @@
             android:padding="@dimen/dimen_16"
             >
 
+            <ImageView
+                android:layout_width="@dimen/dimen_40"
+                android:layout_height="@dimen/dimen_40"
+                app:srcCompat="@drawable/ic_app_icon"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/dimen_16"
+                />
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

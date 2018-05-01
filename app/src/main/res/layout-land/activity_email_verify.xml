@@ -20,13 +20,15 @@
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="@+id/guideline5"
             app:layout_constraintTop_toTopOf="@+id/guideline7"
-            android:src="@drawable/ic_iconmonstr_email_10"/>
+            app:srcCompat="@drawable/ic_iconmonstr_email_10"
+            android:contentDescription="@string/cd_email_img"/>
 
         <ImageView
             android:id="@+id/email_verified_img"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_email_verified"
+            app:srcCompat="@drawable/ic_email_verified"
+            android:contentDescription="@string/cd_email_verified_img"
             app:layout_constraintBottom_toBottomOf="@+id/email_img"
             app:layout_constraintEnd_toStartOf="@+id/guideline6"
             app:layout_constraintStart_toStartOf="@+id/guideline5"

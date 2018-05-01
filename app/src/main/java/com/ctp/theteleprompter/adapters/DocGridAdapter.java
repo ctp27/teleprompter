@@ -3,7 +3,6 @@ package com.ctp.theteleprompter.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindColor;
-import butterknife.BindDrawable;
 import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -72,9 +70,9 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
         holder.itemView.setTag(doc.getId());
 
         if(doc.getId() == pinnedId){
-            holder.pinButton.setImageDrawable(holder.selectedPushPin);
+            holder.pinButton.setImageResource(R.drawable.ic_office_push_pin_selected);
         }else {
-            holder.pinButton.setImageDrawable(holder.pushPin);
+            holder.pinButton.setImageResource(R.drawable.ic_office_push_pin);
         }
 
 
@@ -202,11 +200,6 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
         @BindView(R.id.doc_pin_button)
         ImageView pinButton;
 
-        @BindDrawable(R.drawable.ic_office_push_pin)
-        Drawable pushPin;
-
-        @BindDrawable(R.drawable.ic_office_push_pin_selected)
-        Drawable selectedPushPin;
 
         @BindColor(R.color.lightBlue)
         int colorLightBlue;
@@ -235,6 +228,7 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
             ButterKnife.bind(this,itemView);
             pinButton.setOnClickListener(this);
             colors = new int[]{colorLightYellow,colorLightGreen,colorLightBlue};
+
         }
 
         @Override

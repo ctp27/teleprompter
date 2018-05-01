@@ -31,6 +31,7 @@
             android:id="@+id/text_color_picker_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/cd_text_color_selector"
             app:show_text="false"
             tools:background="@color/colorWhite" />
 
@@ -51,6 +52,7 @@
             android:id="@+id/background_color_picker_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/cd_background_color_chooser"
             app:elevation="6dp"
             app:show_text="false"
             tools:background="@color/colorWhite" />
@@ -62,7 +64,8 @@
         android:layout_width="@dimen/dimen_80"
         android:layout_height="@dimen/dimen_80"
         android:background="@drawable/round_button_shape"
-        android:src="@drawable/ic_play_arrow_white_24dp"
+        app:srcCompat="@drawable/ic_play_arrow_white_24dp"
+        android:contentDescription="@string/cd_play_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -73,6 +76,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/dimen_8"
+        android:contentDescription="@string/scroll_speed_selector"
         android:max="4"
         app:layout_constraintBottom_toTopOf="@+id/horizontal_1_guideline"
         app:layout_constraintEnd_toStartOf="@+id/seekBar_speed_display"
@@ -105,6 +109,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/dimen_16"
         android:max="3"
+        android:contentDescription="@string/cd_font_size_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/font_size_display"
         app:layout_constraintStart_toStartOf="@+id/seekBar_speed" />

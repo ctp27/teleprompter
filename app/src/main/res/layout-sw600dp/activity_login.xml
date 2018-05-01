@@ -77,7 +77,8 @@
             <ImageView
                 android:layout_width="@dimen/dimen_40"
                 android:layout_height="@dimen/dimen_40"
-                android:src="@drawable/ic_app_icon"
+                app:srcCompat="@drawable/ic_app_icon"
+                android:contentDescription="@string/cd_app_icon"
                 android:layout_gravity="center"/>
 
             <android.support.design.widget.TextInputLayout

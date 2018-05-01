@@ -149,6 +149,17 @@
     <string name="letter_green">G</string>
     <string name="letter_b">B</string>
     <string name="text_color_label_text">Text color</string>
+    <string name="cd_app_icon">App icon</string>
+    <string name="cd_create_doc">Create a new Document</string>
+    <string name="cd_email_img">Email Image</string>
+    <string name="cd_email_verified_img">Email Verified Image</string>
+    <string name="cd_edit_pin_doc">Edit Pinned Doc</string>
+    <string name="cd_play_pin_doc">Play Pinned Document</string>
+    <string name="cd_background_color_chooser">Choose Background color</string>
+    <string name="cd_play_btn">Play Document</string>
+    <string name="scroll_speed_selector">Scroll Speed Selector</string>
+    <string name="cd_text_color_selector">Choose Text Color</string>
+    <string name="cd_font_size_selector">Font size selector</string>
 
 
 </resources>

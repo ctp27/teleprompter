@@ -36,7 +36,7 @@
                 <ImageView
                     android:layout_width="@dimen/dimen_40"
                     android:layout_height="@dimen/dimen_40"
-                    android:src="@drawable/ic_app_icon"
+                    app:srcCompat="@drawable/ic_app_icon"
                     android:layout_gravity="center"
                     android:layout_margin="@dimen/dimen_16"
                     />
