@@ -16,10 +16,11 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_72"
+        android:layout_height="@dimen/dimen_120"
         android:background="@color/colorPrimary"
         android:padding="16dp"
         android:id="@+id/app_banner_view"
+        android:layout_gravity="bottom"
         >
 
         <TextView
@@ -29,25 +30,37 @@
             android:textSize="32sp"
             android:textColor="@color/colorWhite"
             android:gravity="bottom"
-            android:layout_marginStart="@dimen/dimen_16"
-            android:layout_marginLeft="@dimen/dimen_16"
+            android:layout_marginStart="@dimen/dimen_32"
+            android:layout_marginLeft="@dimen/dimen_32"
             android:textStyle="bold"/>
 
+
     </FrameLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/login_progress"
-        android:visibility="gone">
 
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/dimen_8"
-            android:layout_gravity="center"
-            android:gravity="center"/>
-    </FrameLayout>
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="504dp"
+        android:layout_height="544dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="120dp"
+
+        >
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/login_progress"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dimen_8"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+        </FrameLayout>
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -110,13 +123,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/dimen_16">
 
             <Button
                 android:id="@+id/email_sign_in_button"
                 android:background="@color/colorPrimary"
                 android:textColor="@color/colorWhite"
-                android:layout_width="match_parent"
+                android:layout_width="@dimen/dimen_200"
+                android:gravity="center"
+                android:layout_gravity="center"
                 android:layout_height="wrap_content"
                 android:text="@string/action_sign_in"
                 android:layout_margin="@dimen/dimen_16"
@@ -167,7 +183,7 @@
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/google_sign_in_button"
                 android:layout_gravity="center"
-                android:layout_width="match_parent"
+                android:layout_width="@dimen/dimen_200"
                 android:layout_marginStart="@dimen/dimen_16"
                 android:layout_marginEnd="@dimen/dimen_16"
                 android:layout_height="wrap_content" />
@@ -177,7 +193,8 @@
                 android:layout_marginStart="@dimen/dimen_16"
                 android:layout_marginEnd="@dimen/dimen_16"
                 android:id="@+id/sign_up_button"
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="@dimen/dimen_200"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorWhite"
                 android:background="@color/colorPrimaryDark"
@@ -187,4 +204,5 @@
 
         </LinearLayout>
     </ScrollView>
+    </android.support.v7.widget.CardView>
 </LinearLayout>

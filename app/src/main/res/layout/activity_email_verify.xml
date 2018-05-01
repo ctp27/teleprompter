@@ -14,8 +14,8 @@
 
     <ImageView
         android:id="@+id/email_img"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dimen_200"
+        android:layout_height="@dimen/dimen_200"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
         app:layout_constraintStart_toStartOf="@+id/guideline5"
@@ -24,8 +24,8 @@
 
     <ImageView
         android:id="@+id/email_verified_img"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dimen_200"
+        android:layout_height="@dimen/dimen_200"
         android:src="@drawable/ic_email_verified"
         app:layout_constraintBottom_toBottomOf="@+id/email_img"
         app:layout_constraintEnd_toStartOf="@+id/guideline6"
@@ -161,7 +161,7 @@
         android:id="@+id/display_verified"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:constraint_referenced_ids="email_verified_img,textView_verified,progress_bar"
         />
 

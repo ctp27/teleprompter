@@ -26,5 +26,9 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="dimen_64">64dp</dimen>
     <dimen name="dimen_6">6dp</dimen>
     <dimen name="dimen_72">72dp</dimen>
+    <dimen name="dimen_160">160dp</dimen>
+    <dimen name="dimen_180">160dp</dimen>
+    <dimen name="dimen_200">200dp</dimen>
+    <dimen name="dimen_808">808dp</dimen>
 
 </resources>

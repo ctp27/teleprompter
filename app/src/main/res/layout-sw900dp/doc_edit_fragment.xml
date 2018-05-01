@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,24 +9,22 @@
     <android.support.v7.widget.CardView
         android:id="@+id/doc_details_card_container"
         android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_marginBottom="64dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:paddingBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/control_view"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_editor_controls"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="match_parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+               >
 
 
                 <EditText
@@ -43,7 +39,7 @@
                     android:background="@android:color/transparent"
                     android:hint="@string/doc_detail_title_hint"
                     android:maxLength="60"
-                    android:textSize="24sp"
+                    android:textSize="32sp"
                     android:textStyle="bold" />
 
                 <EditText
@@ -57,6 +53,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+
                     android:background="@android:color/transparent"
                     android:gravity="top"
                     android:hint="@string/detail_text_hint"
@@ -66,16 +63,27 @@
             </RelativeLayout>
 
         </ScrollView>
+
     </android.support.v7.widget.CardView>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_editor_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7"/>
+
 
     <include
         android:id="@+id/control_view"
         layout="@layout/doc_edit_controls_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_editor_controls"
+
+        />
 
 </android.support.constraint.ConstraintLayout>
