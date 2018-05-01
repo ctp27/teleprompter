@@ -1,4 +1,4 @@
-#The Teleprompter
+# The Teleprompter
 
 * Planned and developed a teleprompter for Android devices, where users can create, edit, play and share documents. Documents are synced  locally through a Content Provider and on the cloud using the Firebase Realtime Database. 
 * Created custom views for application specific functionality and Widget to provide essential shortcuts on the homescreen.
