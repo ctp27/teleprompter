@@ -30,5 +30,8 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="dimen_180">160dp</dimen>
     <dimen name="dimen_200">200dp</dimen>
     <dimen name="dimen_808">808dp</dimen>
+    <dimen name="dimen_840">840dp</dimen>
+    <dimen name="dimen_504">504dp</dimen>
+    <dimen name="dimen_800">800dp</dimen>
 
 </resources>

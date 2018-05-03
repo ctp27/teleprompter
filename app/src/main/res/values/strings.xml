@@ -162,4 +162,9 @@
     <string name="cd_font_size_selector">Font size selector</string>
 
 
+
+    <!--Delete Confirmation Dialog Fragment -->
+    <string name="delete_confm_title">Delete</string>
+    <string name="delete_confm_msg">Are you sure you want to delete %1$s ?</string>
+
 </resources>

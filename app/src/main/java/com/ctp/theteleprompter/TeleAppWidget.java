@@ -5,7 +5,12 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.content.res.AppCompatResources;
 import android.widget.RemoteViews;
 
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
@@ -20,7 +25,6 @@ public class TeleAppWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId, Doc doc, boolean isLoggedIn) {
-
         CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = getRemoteViews(context,doc,isLoggedIn);
@@ -60,6 +64,8 @@ public class TeleAppWidget extends AppWidgetProvider {
 
     private static RemoteViews getRemoteViews(Context context, Doc doc, boolean isLoggedIn){
 
+
+
         PendingIntent newDocPendingIntent =null;
         PendingIntent editDocPendingIntent = null;
         PendingIntent slideShowPendingIntent = null;
@@ -89,11 +95,46 @@ public class TeleAppWidget extends AppWidgetProvider {
         }
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.tele_app_widget);
+        setWidgetIcons(views,context);
         views.setOnClickPendingIntent(R.id.widget_new_doc,newDocPendingIntent);
         views.setOnClickPendingIntent(R.id.widget_edit_pin_doc,editDocPendingIntent);
         views.setOnClickPendingIntent(R.id.widget_play_pinned_doc,slideShowPendingIntent);
 
         return views;
+    }
+
+
+    private static void setWidgetIcons(RemoteViews remoteViews, Context context) {
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            remoteViews.setImageViewResource(R.id.widget_new_doc, R.drawable.ic_add_white_24dp);
+            remoteViews.setImageViewResource(R.id.widget_edit_pin_doc,R.drawable.ic_edit_black_24dp);
+            remoteViews.setImageViewResource(R.id.widget_play_pinned_doc,R.drawable.ic_play_arrow_white_24dp);
+
+        } else {
+
+            setPreLollipopImageResource(remoteViews,
+                    context,R.id.widget_new_doc,R.drawable.ic_add_white_24dp);
+            setPreLollipopImageResource(remoteViews,
+                    context,R.id.widget_edit_pin_doc,R.drawable.ic_edit_black_24dp);
+            setPreLollipopImageResource(remoteViews,
+                    context,R.id.widget_play_pinned_doc,R.drawable.ic_play_arrow_white_24dp);
+
+        }
+
+    }
+
+    private static void setPreLollipopImageResource(RemoteViews remoteViews,Context context, int viewId,int drawable) {
+        Drawable d = AppCompatResources.getDrawable(context, drawable);
+        Bitmap b = Bitmap.createBitmap(d.getIntrinsicWidth(),
+                d.getIntrinsicHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        d.setBounds(0, 0, c.getWidth(), c.getHeight());
+        d.draw(c);
+        remoteViews.setImageViewBitmap(viewId, b);
     }
 
 

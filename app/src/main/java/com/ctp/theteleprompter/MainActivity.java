@@ -2,6 +2,7 @@ package com.ctp.theteleprompter;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 import com.ctp.theteleprompter.adapters.DocGridAdapter;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
+import com.ctp.theteleprompter.fragments.DeleteConfirmDialogFragment;
 import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.services.TeleWidgetService;
@@ -53,11 +55,14 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity
             implements DocGridAdapter.DocGridAdapterCallbacks,
-                LoaderManager.LoaderCallbacks<Cursor>{
+                LoaderManager.LoaderCallbacks<Cursor>,
+        DeleteConfirmDialogFragment.DeleteConfirmDialogCallbacks{
 
     private static final int DOC_LOADER_ID = 10001;
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String INTENT_EXTRA_NO_PINNED_DOC="no-pinned-doc";
+    private static final String EXTRA_DELETED_DOC_KEY = "extra-deleted_doc";
+    private static final String EXTRA_DELETED_DOC_POS = "extra-deleted_doc_pos" ;
 
     @BindView(R.id.main_doc_recycler_view)
     RecyclerView docGridView;
@@ -90,6 +95,11 @@ public class MainActivity extends AppCompatActivity
 
     private DocGridAdapter adapter;
 
+
+    private Doc deletedDoc;
+    private int deletedDocPosition;
+    private String DELETE_CONF_DIALOG_TAG ="delete_dialog_tag";
+
 //    private IntentFilter intentFilter;
 
     @Override
@@ -103,6 +113,15 @@ public class MainActivity extends AppCompatActivity
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         docsMoved = false;
+
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey(EXTRA_DELETED_DOC_KEY)) {
+                deletedDoc = savedInstanceState.getParcelable(EXTRA_DELETED_DOC_KEY);
+                deletedDocPosition = savedInstanceState.getInt(EXTRA_DELETED_DOC_POS);
+            }
+        }
+
+
         initializeWidgets();
 
 
@@ -114,6 +133,7 @@ public class MainActivity extends AppCompatActivity
                         Snackbar.LENGTH_LONG).show();
             }
         }
+
 
 
 
@@ -248,8 +268,17 @@ public class MainActivity extends AppCompatActivity
 
                 Doc doc = adapter.getDocAtPosition(position);
 
-                DocService.deleteDoc(MainActivity.this,doc);
-                adapter.deletePosition(position);
+//                DocService.deleteDoc(MainActivity.this,doc);
+
+                deletedDoc = doc;
+                deletedDocPosition = position;
+
+                DeleteConfirmDialogFragment fragment = new DeleteConfirmDialogFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString(DeleteConfirmDialogFragment.EXTRA_DOC_NAME,doc.getTitle());
+                fragment.setArguments(bundle);
+
+                fragment.show(getSupportFragmentManager(),DELETE_CONF_DIALOG_TAG);
 
             }
         }).attachToRecyclerView(docGridView);
@@ -296,6 +325,34 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
+    /**
+     * Called when user confirms deletion of a document. The method deletes the doc permanently
+     * @param dialogInterface The dialog interface of the deleteConfirmDialogFragment
+     */
+    @Override
+    public void onConfirmDeleteDocument(DialogInterface dialogInterface) {
+        DocService.deleteDoc(this,deletedDoc);
+        adapter.deletePosition(deletedDocPosition);
+        Snackbar.make(drawerLayout,"Deleted "+ deletedDoc.getTitle(),Snackbar.LENGTH_LONG).show();
+        deletedDoc = null;
+        deletedDocPosition =-1;
+
+    }
+
+    /**
+     * Called when the user cancels the delete. Reinserts the deleted doc back into the
+     * recycler view
+     * @param dialogInterface
+     */
+    @Override
+    public void onCancelDeleteDocument(DialogInterface dialogInterface) {
+//        adapter.reinsertDoc(deletedDoc,deletedDocPosition);
+        adapter.notifyDataSetChanged();
+    }
+
+
 
     private void startDocSync(){
         if(TeleUtils.isConnectedToNetwork(MainActivity.this)){
@@ -362,6 +419,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if(deletedDoc!=null){
+            outState.putParcelable(EXTRA_DELETED_DOC_KEY,deletedDoc);
+            outState.putInt(EXTRA_DELETED_DOC_POS,deletedDocPosition);
+        }
 
     }
 

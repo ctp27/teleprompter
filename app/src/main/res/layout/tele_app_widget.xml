@@ -1,6 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -17,10 +16,10 @@
     <ImageButton
         android:id="@+id/widget_new_doc"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:padding="@dimen/dimen_4"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/cd_create_doc"
-        app:srcCompat="@drawable/ic_add_white_24dp"
         style="?android:attr/borderlessButtonStyle"
         />
 
@@ -36,8 +35,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:padding="@dimen/dimen_4"
         android:contentDescription="@string/cd_edit_pin_doc"
-        app:srcCompat="@drawable/ic_edit_black_24dp"
         style="?android:attr/borderlessButtonStyle"/>
 
     <FrameLayout
@@ -50,10 +49,10 @@
     <ImageButton
         android:id="@+id/widget_play_pinned_doc"
         android:layout_width="0dp"
+        android:padding="@dimen/dimen_4"
         android:layout_weight="1"
         android:layout_height="match_parent"
         android:contentDescription="@string/cd_play_pin_doc"
-        app:srcCompat="@drawable/ic_play_arrow_white_24dp"
         style="?android:attr/borderlessButtonStyle"
         />
 

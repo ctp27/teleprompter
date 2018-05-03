@@ -139,6 +139,16 @@ public class DocGridAdapter extends RecyclerView.Adapter<DocGridAdapter.DocGridV
     }
 
 
+    public void reinsertDoc(Doc doc, int position){
+
+        if(doc!=null){
+            docList.add(position,doc);
+        }
+
+        notifyDataSetChanged();
+    }
+
+
     public List<Doc> getDocList() {
         return docList;
     }
