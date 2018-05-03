@@ -131,6 +131,13 @@ public class DocService extends IntentService {
 
     }
 
+
+    /**
+     * Handles the startup sync of the Docs. This is used when the user first logs in or creates
+     * an account. It checks if the user has docs on the cloud. If he does, it retrieves the docs
+     * else it creates a new space on the database with tutorial docs.
+     * @param intent The intent used to start the service
+     */
     private void handleActionStartupDocSync(final Intent intent) {
 
         final String userId = intent.getStringExtra(EXTRA_KEY);
@@ -245,7 +252,7 @@ public class DocService extends IntentService {
             }
         }
         catch (Exception e){
-
+            Log.d(TAG,"Some Error occurred");
         }
 
     }

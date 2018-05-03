@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 
 import com.ctp.theteleprompter.EmailVerifyAcitivity;
 import com.ctp.theteleprompter.LoginActivity;
+import com.ctp.theteleprompter.MainActivity;
 import com.ctp.theteleprompter.R;
 import com.ctp.theteleprompter.SignUpActivity;
 
@@ -79,6 +80,17 @@ public class RequestInternetDialogFragment extends DialogFragment {
 
             try {
                 mCallback = acitivity;
+            }
+            catch (ClassCastException d){
+                throw new ClassCastException(d.toString() + "must implement RequestInternetDialogCallback");
+            }
+        }
+        else if(context instanceof MainActivity){
+            MainActivity activity = (MainActivity) context;
+
+
+            try {
+                mCallback = activity;
             }
             catch (ClassCastException d){
                 throw new ClassCastException(d.toString() + "must implement RequestInternetDialogCallback");

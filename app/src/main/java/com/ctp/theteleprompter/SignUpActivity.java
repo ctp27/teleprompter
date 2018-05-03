@@ -110,14 +110,14 @@ public class SignUpActivity extends AppCompatActivity
         }
 
         // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(password) && TeleUtils.isValidPassword(password)) {
+        if (TextUtils.isEmpty(password) && !TeleUtils.isValidPassword(password)) {
             passwordInput.setError(getString(R.string.error_invalid_password));
             focusView = passwordInput;
             cancel = true;
         }
 
 
-        if(TextUtils.isEmpty(confirmPassword) && TeleUtils.isValidPassword(confirmPassword)){
+        if(TextUtils.isEmpty(confirmPassword) && !TeleUtils.isValidPassword(confirmPassword)){
             confirmPasswordInput.setError(getString(R.string.error_invalid_password));
             focusView = confirmPasswordInput;
             cancel = true;
@@ -208,10 +208,17 @@ public class SignUpActivity extends AppCompatActivity
 
     }
 
-
+    /**
+     * Prepares the ActionCodeSettings to start the app on email confirmation
+     * Sends the verification mail with the ActionSettings
+     * @param user The firebase user obtained from sign up.
+     */
     private void sendUserVerificationEmail(FirebaseUser user){
 
+        /*  Get ActionCodeSettings Setttings */
         ActionCodeSettings actionCodeSettings = TeleUtils.getActionCodeSettingsForUser(user);
+
+        /*  Send verification mail */
         user.sendEmailVerification(actionCodeSettings)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

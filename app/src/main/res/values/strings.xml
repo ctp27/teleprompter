@@ -166,5 +166,8 @@
     <!--Delete Confirmation Dialog Fragment -->
     <string name="delete_confm_title">Delete</string>
     <string name="delete_confm_msg">Are you sure you want to delete %1$s ?</string>
+    <string name="cd_pin_doc">Pin this document</string>
+    <string name="cd_email_verification_image">Email Verification Image</string>
+    <string name="cd_email_verified_image">Email Successfully Verified image</string>
 
 </resources>

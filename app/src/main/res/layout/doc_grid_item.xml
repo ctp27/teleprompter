@@ -68,6 +68,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
+            android:contentDescription="@string/cd_pin_doc"
             android:padding="0dp"
             app:srcCompat="@drawable/ic_office_push_pin"
             app:layout_constraintEnd_toEndOf="parent"

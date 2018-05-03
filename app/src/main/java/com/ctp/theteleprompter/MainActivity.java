@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -35,6 +36,7 @@ import com.ctp.theteleprompter.adapters.DocGridAdapter;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.data.TeleContract;
 import com.ctp.theteleprompter.fragments.DeleteConfirmDialogFragment;
+import com.ctp.theteleprompter.fragments.RequestInternetDialogFragment;
 import com.ctp.theteleprompter.model.Doc;
 import com.ctp.theteleprompter.services.DocService;
 import com.ctp.theteleprompter.services.TeleWidgetService;
@@ -56,13 +58,15 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity
             implements DocGridAdapter.DocGridAdapterCallbacks,
                 LoaderManager.LoaderCallbacks<Cursor>,
-        DeleteConfirmDialogFragment.DeleteConfirmDialogCallbacks{
+        DeleteConfirmDialogFragment.DeleteConfirmDialogCallbacks,
+        RequestInternetDialogFragment.RequestInternetDialogFragmentCallbacks{
 
     private static final int DOC_LOADER_ID = 10001;
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String INTENT_EXTRA_NO_PINNED_DOC="no-pinned-doc";
     private static final String EXTRA_DELETED_DOC_KEY = "extra-deleted_doc";
     private static final String EXTRA_DELETED_DOC_POS = "extra-deleted_doc_pos" ;
+    private static final String REQUEST_INTERNET_DIALOG_TAG = "request_internet_dialog-tags" ;
 
     @BindView(R.id.main_doc_recycler_view)
     RecyclerView docGridView;
@@ -359,9 +363,21 @@ public class MainActivity extends AppCompatActivity
             DocService.syncDocs(MainActivity.this,
                     SharedPreferenceUtils.getPrefUserId(MainActivity.this));
         }else {
-//            TODO:startDialog for internet
-            Snackbar.make(drawerLayout,"Internet Connection not available. Check your connection and try again",Snackbar.LENGTH_LONG);
+            RequestInternetDialogFragment fragment = new RequestInternetDialogFragment();
+            fragment.show(getSupportFragmentManager(),REQUEST_INTERNET_DIALOG_TAG);
+//            :startDialog for internet
         }
+
+    }
+
+
+    @Override
+    public void onUserAcceptsInternetRequest(DialogInterface dialogInterface) {
+        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+    }
+
+    @Override
+    public void onUserDeniesInternetRequest(DialogInterface dialogInterface) {
 
     }
 

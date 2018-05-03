@@ -40,7 +40,7 @@
                 android:id="@+id/nav_account_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="abc@example.com"
+                tools:text="abc@example.com"
                 />
     </LinearLayout>
 
