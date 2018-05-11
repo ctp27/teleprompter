@@ -14,5 +14,46 @@
 ![screenshot1](screenshots/tele_main_mov.gif)
 
 
+<br><br>
+
+
+The application provides various customization options to create and edit documents.
+It also provides customization for choosing the text color, background color, scroll speed and 
+font size.
+
+
+<br><br>
+
+![screenshot1](screenshots/tele_new_doc.gif)
+![screenshot1](screenshots/tele_color_picker.png)
+
+
+<br><br>
+
+Seamlessly play documents with your selected customization options.
+
+![screenshot1](screenshots/tele_slide_show.gif)
+![screenshot1](screenshots/tele_slide_show_allt.gif)
+
+<br><br>
+
+The application provides a flexible layout for different screen sizes. 
+Optimized design for tablet devices.
+
+
+![screenshot1](screenshots/tele_main_tab.png)
+
+<br><br>
+
+![screenshot1](screenshots/tele_new_doc_tab.png)
+
+
+#Download from Google Play
+
+The application can be downloaded from Google Play using 
+the following URL
+
+https://play.google.com/store/apps/details?id=com.ctp.theteleprompter
+
 
 
