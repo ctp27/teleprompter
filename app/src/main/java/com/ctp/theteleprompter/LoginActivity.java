@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity
         googleSignInButton.setSize(SignInButton.SIZE_WIDE);
 
         /*  Populate the autocomplete   */
-        populateAutoComplete();
+//        populateAutoComplete();
 
         /*  Get Firebase Auth instance  */
         mAuth = FirebaseAuth.getInstance();

@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.app.SharedElementCallback;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,8 @@ import butterknife.OnClick;
 
 public class DocEditActivityFragment extends Fragment
             implements TextColorDialogFragment.TextColorDialogCallbacks,
-                        SeekBar.OnSeekBarChangeListener
+                        SeekBar.OnSeekBarChangeListener,
+        DeleteConfirmDialogFragment.DeleteConfirmDialogCallbacks
                         {
 
 
@@ -46,8 +46,9 @@ public class DocEditActivityFragment extends Fragment
     private static final String BUNDLE_DATA_OBJECT = "bundle_data_object";
 
     private static final String TAG = DocEditActivityFragment.class.getSimpleName();
+                            private static final String DELETE_CONF_DIALOG_TAG = "tag-delete-dialog";
 
-    public DocEditActivityFragment() {
+                            public DocEditActivityFragment() {
     }
 
 
@@ -348,7 +349,7 @@ public class DocEditActivityFragment extends Fragment
         /*if title equals the old title and text equals the old text
                 return*/
         if(titleStore.equals(title) && textStore.equals(body)){
-            Log.d(TAG,"Not going to persist, since its same as last persist");
+//            Log.d(TAG,"Not going to persist, since its same as last persist");
             return;
         }
 
@@ -361,7 +362,7 @@ public class DocEditActivityFragment extends Fragment
                 thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
                 thisDoc.setCloudId(SharedPreferenceUtils.getLastStoredCloudId(getContext()));
                 DocService.deleteDoc(getContext(),thisDoc);
-                Log.d(TAG, "Content changed to empty after orientation. Delete the doc "+thisDoc.getId());
+//                Log.d(TAG, "Content changed to empty after orientation. Delete the doc "+thisDoc.getId());
                 return;
         }
 
@@ -373,7 +374,7 @@ public class DocEditActivityFragment extends Fragment
                 thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
                 thisDoc.setCloudId(SharedPreferenceUtils.getLastStoredCloudId(getContext()));
                 DocService.updateDoc(getContext(),thisDoc);
-                Log.d(TAG,"Content not changed to empty after orientation changed, update doc "+thisDoc.getId());
+//                Log.d(TAG,"Content not changed to empty after orientation changed, update doc "+thisDoc.getId());
             }
             else {
 
@@ -381,7 +382,7 @@ public class DocEditActivityFragment extends Fragment
                 thisDoc.setTitle(title);
                 thisDoc.setText(body);
                 thisDoc.setUserId(SharedPreferenceUtils.getPrefUserId(getContext()));
-                Log.d(TAG,"Content not same and not empty and not persisted before, insert doc "+thisDoc.getId());
+//                Log.d(TAG,"Content not same and not empty and not persisted before, insert doc "+thisDoc.getId());
                 DocService.insertDoc(getContext(),thisDoc);
             }
         }
@@ -399,9 +400,9 @@ public class DocEditActivityFragment extends Fragment
         String body = textBody.getText().toString();
 
         if(titleStore.equals(title) && textStore.equals(body)){
-            Log.d(TAG,"Not going to persist, since its same as last persist");
+//            Log.d(TAG,"Not going to persist, since its same as last persist");
         }else {
-            Log.d(TAG, "Updating this old doc with Id "+thisDoc.getId());
+//            Log.d(TAG, "Updating this old doc with Id "+thisDoc.getId());
             thisDoc.setText(body);
             thisDoc.setTitle(title);
 
@@ -414,7 +415,16 @@ public class DocEditActivityFragment extends Fragment
     }
 
     public void deleteDoc(){
+        DeleteConfirmDialogFragment fragment = new DeleteConfirmDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(DeleteConfirmDialogFragment.EXTRA_DOC_NAME,thisDoc.getTitle());
+        fragment.setArguments(bundle);
+        fragment.show(getFragmentManager(),DELETE_CONF_DIALOG_TAG);
 
+    }
+
+    @Override
+    public void onConfirmDeleteDocument(DialogInterface dialogInterface) {
         if(thisDoc.isNew()){
             if(orientationChanged){
                 thisDoc.setId(SharedPreferenceUtils.getLastStoredId(getContext()));
@@ -430,6 +440,10 @@ public class DocEditActivityFragment extends Fragment
         getActivity().finish();
     }
 
+    @Override
+    public void onCancelDeleteDocument(DialogInterface dialogInterface) {
+
+    }
 
     public void shareDoc(){
 

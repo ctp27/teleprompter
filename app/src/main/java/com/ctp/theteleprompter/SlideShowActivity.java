@@ -98,7 +98,7 @@ public class SlideShowActivity extends AppCompatActivity
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
                 delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                view.performClick();
+//                view.performClick();
             }
             return false;
         }
@@ -111,7 +111,7 @@ public class SlideShowActivity extends AppCompatActivity
             if (AUTO_HIDE) {
                 delayedHide(AUTO_HIDE_DELAY_MILLIS);
                 animators.start();
-                view.performClick();
+//                view.performClick();
 
             }
             return false;

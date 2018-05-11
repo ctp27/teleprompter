@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
+import com.ctp.theteleprompter.DocEditActivity;
 import com.ctp.theteleprompter.MainActivity;
 import com.ctp.theteleprompter.R;
 
@@ -70,6 +71,16 @@ public class DeleteConfirmDialogFragment extends DialogFragment {
                 mCallback = activity;
             }catch (ClassCastException c){
                 throw new ClassCastException(c.toString()
+                        + " must implement DeleteDialogCallbacks");
+            }
+
+        }else if(context instanceof DocEditActivity){
+            DocEditActivity docEditActivity =  (DocEditActivity) context;
+            try {
+                mCallback = (DocEditActivityFragment)docEditActivity.getSupportFragmentManager().findFragmentByTag(DocEditActivity.DOC_EDIT_FRAGMENT_TAG);
+            }
+            catch (ClassCastException e){
+                throw new ClassCastException(e.toString()
                         + " must implement DeleteDialogCallbacks");
             }
 
