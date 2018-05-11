@@ -321,8 +321,8 @@ public class MainActivity extends AppCompatActivity
         nav_alph.setText(accountName.substring(0,1));
 
         docGridView.setAdapter(adapter);
-        MobileAds.initialize(this,
-                "ca-app-pub-3940256099942544~3347511713");
+        MobileAds.initialize(getApplicationContext(),
+                getString(R.string.admob_app_id));
 
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);

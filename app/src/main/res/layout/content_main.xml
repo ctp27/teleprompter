@@ -52,6 +52,7 @@
 
 
     <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ad_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,6 +76,7 @@
         android:layout_marginEnd="@dimen/dimen_16"
         android:layout_marginRight="@dimen/dimen_16"
         android:contentDescription="@string/cd_create_doc"
+        ads:adUnitId="@string/admob_main_banner_id"
         app:srcCompat="@drawable/ic_add_white_24dp"
         ads:layout_constraintBottom_toTopOf="@+id/ad_view"
         ads:layout_constraintEnd_toEndOf="parent" />

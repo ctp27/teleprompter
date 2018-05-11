@@ -22,7 +22,9 @@
 
     <!--Important Firebase connectivity ids-->
     <string name="webclient_server_id" translatable="false">644889287337-hoiqaclr3otr975103s7mc2sc1n51vha.apps.googleusercontent.com</string>
-
+    <!--AdMob-->
+    <string name="admob_app_id">ca-app-pub-4640678949548266~5677337553</string>
+    <string name="admob_main_banner_id">ca-app-pub-4640678949548266/9088849394</string>
     <!-- Strings related to Settings -->
 
 

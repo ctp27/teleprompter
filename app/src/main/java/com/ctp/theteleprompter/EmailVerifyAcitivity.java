@@ -162,7 +162,7 @@ public class EmailVerifyAcitivity extends AppCompatActivity
             SharedPreferenceUtils.setPrefUserId(this,user.getUid());
             SharedPreferenceUtils.setPrefEmail(this,user.getEmail());
             DocService.performStartupDocSync(this,user.getUid());
-            
+
             navigateToMainActivity();
 
 
