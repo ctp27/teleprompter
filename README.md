@@ -5,3 +5,14 @@
 * The application authenticates users through an email or Google Sign in using Firebase Authentication and Firebase Email Verification.  Forgotten passwords can be retrieved using the email
 * Performed UI tests using the Espresso testing framework and provided Ad Service using Google AdMobs
 * Designed a responsive user interface for phones and tablets by following the Material Design guidelines
+
+
+<br><br>
+
+![screenshot1](screenshots/tele_sign_in.gif)
+![screenshot1](screenshots/tele_main.png)
+![screenshot1](screenshots/tele_main_mov.gif)
+
+
+
+
