@@ -45,10 +45,10 @@ Optimized design for tablet devices.
 
 <br><br>
 
-![screenshot1](screenshots/tele_new_doc_tab.png)
+![screenshot1](screenshots/tele_new_doc_tab.gif)
 
 
-#Download from Google Play
+# Download from Google Play
 
 The application can be downloaded from Google Play using 
 the following URL
