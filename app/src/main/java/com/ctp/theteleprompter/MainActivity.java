@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        MobileAds.initialize(getApplicationContext(),
+                getString(R.string.admob_app_id));
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
@@ -321,8 +323,7 @@ public class MainActivity extends AppCompatActivity
         nav_alph.setText(accountName.substring(0,1));
 
         docGridView.setAdapter(adapter);
-        MobileAds.initialize(getApplicationContext(),
-                getString(R.string.admob_app_id));
+
 
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);

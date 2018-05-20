@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import com.ctp.theteleprompter.data.SharedPreferenceUtils;
 import com.ctp.theteleprompter.model.TeleSpec;
 import com.ctp.theteleprompter.ui.SlideShowScrollView;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -162,6 +165,8 @@ public class SlideShowActivity extends AppCompatActivity
 
     private boolean isTextMirrored;
 
+    private PublisherInterstitialAd mPublisherInterstitialAd;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -176,6 +181,10 @@ public class SlideShowActivity extends AppCompatActivity
         if(savedInstanceState == null){
             isFirstTime = true;
         }
+
+        mPublisherInterstitialAd = new PublisherInterstitialAd(this);
+        mPublisherInterstitialAd.setAdUnitId(getString(R.string.admob_interstital_ad_id));
+        mPublisherInterstitialAd.loadAd(new PublisherAdRequest.Builder().build());
 
 //        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(3));
         TeleSpec teleSpec=null;
@@ -253,6 +262,18 @@ public class SlideShowActivity extends AppCompatActivity
 
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if(id == android.R.id.home){
+            onBackPressed();
+            return true;
+        }else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -383,6 +404,24 @@ public class SlideShowActivity extends AppCompatActivity
 
 
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if(mPublisherInterstitialAd.isLoaded()){
+
+            if(SharedPreferenceUtils.getAdCounter(this)==0) {
+                mPublisherInterstitialAd.show();
+                SharedPreferenceUtils.incrementAdCounter(this);
+            }
+            else {
+                SharedPreferenceUtils.incrementAdCounter(this);
+            }
+        }
+
     }
 
     @Override

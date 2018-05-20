@@ -159,4 +159,24 @@ public class SharedPreferenceUtils {
         editor.apply();
     }
 
+
+    public static void incrementAdCounter(Context context){
+
+        int counter = getAdCounter(context);
+        counter++;
+        if(counter>=2){
+            counter=0;
+        }
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(context.getString(R.string.pref_ad_increment_key),counter);
+        editor.apply();
+    }
+
+    public static int getAdCounter(Context context){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getInt(context.getString(R.string.pref_ad_increment_key),0);
+    }
+
 }

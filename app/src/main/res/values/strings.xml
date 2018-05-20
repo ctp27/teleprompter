@@ -23,8 +23,10 @@
     <!--Important Firebase connectivity ids-->
     <string name="webclient_server_id" translatable="false">644889287337-hoiqaclr3otr975103s7mc2sc1n51vha.apps.googleusercontent.com</string>
     <!--AdMob-->
-    <string name="admob_app_id">ca-app-pub-4640678949548266~5677337553</string>
+    <string name="admob_app_id">
+       ca-app-pub-4640678949548266~5677337553</string>
     <string name="admob_main_banner_id">ca-app-pub-4640678949548266/9088849394</string>
+    <string name="admob_interstital_ad_id">ca-app-pub-4640678949548266/5417508752</string>
     <!-- Strings related to Settings -->
 
 
@@ -40,7 +42,7 @@
     <string name="pref_last_id_key" translatable="false">pref_last_id_key_string</string>
     <string name="pref_last_cloudId_key" translatable="false">pref_last_cloudid_key_string</string>
     <string name="pref_pinned_doc_key" translatable="false">pref_pinned_doc_string</string>
-
+    <string name="pref_ad_increment_key" translatable="false">pref_ad_inccrement_key</string>
 
     <string name="action_logout">Logout</string>
 
